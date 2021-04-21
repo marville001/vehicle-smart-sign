@@ -27,6 +27,8 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "description": "Final year project",
+    "githubUrl": "https://github.com/marville001/vehicle-smart-sign.git"
   }
 }

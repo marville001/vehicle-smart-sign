@@ -9,8 +9,9 @@ import {
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
-import Home from "../app/screens/Home";
-import Contact from "../app/screens/Contact";
+
+import Home from "../screens/Home";
+import Contact from "../screens/Contact";
 
 const CustomDrawercontent = (props) => {
   return (
@@ -34,22 +35,16 @@ const CustomDrawercontent = (props) => {
 
 const Drawer = createDrawerNavigator();
 
-const MyDrawer = () => {
-  return (
-    <Drawer.Navigator
-      backBehavior="history"
-      drawerContent={(props) => <CustomDrawercontent {...props} />}
-    >
-      <Drawer.Screen name="Home" component={Home} />
-      <Drawer.Screen name="Contact" component={Contact} />
-    </Drawer.Navigator>
-  );
-};
-
 const DrawerNavigation = () => {
   return (
     <NavigationContainer>
-      <MyDrawer />
+      <Drawer.Navigator
+        backBehavior="history"
+        drawerContent={(props) => <CustomDrawercontent {...props} />}
+      >
+        <Drawer.Screen name="Home" component={Home} />
+        <Drawer.Screen name="Contact" component={Contact} />
+      </Drawer.Navigator>
     </NavigationContainer>
   );
 };
