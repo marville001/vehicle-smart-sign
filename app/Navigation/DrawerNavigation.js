@@ -10,8 +10,8 @@ import {
   DrawerItem,
 } from "@react-navigation/drawer";
 
-import Home from "../screens/Home";
-import Contact from "../screens/Contact";
+import Home from "../scenes/Home";
+import Contact from "../scenes/Contact";
 
 const CustomDrawercontent = (props) => {
   return (
