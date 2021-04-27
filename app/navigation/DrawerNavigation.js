@@ -37,7 +37,7 @@ const Drawer = createDrawerNavigator();
 
 const DrawerNavigation = () => {
   return (
-    <NavigationContainer>
+    <>
       <Drawer.Navigator
         backBehavior="history"
         drawerContent={(props) => <CustomDrawercontent {...props} />}
@@ -45,7 +45,7 @@ const DrawerNavigation = () => {
         <Drawer.Screen name="Home" component={Home} />
         <Drawer.Screen name="Contact" component={Contact} />
       </Drawer.Navigator>
-    </NavigationContainer>
+    </>
   );
 };
 

@@ -1,4 +1,4 @@
-export const firebaseConfig = {
+export default {
   apiKey: "AIzaSyBXC9U7DkjEO3VEkRR9Zk1HyOPqp7u2o94",
   authDomain: "smartsign-a6126.firebaseapp.com",
   projectId: "smartsign-a6126",
