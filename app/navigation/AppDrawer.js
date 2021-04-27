@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { View, StyleSheet, ScrollView, Text } from "react-native";
 
 import {
@@ -10,6 +10,7 @@ import {
 
 import Home from "../scenes/Home";
 import Contact from "../scenes/Contact";
+import AuthContext from "./AuthProvider";
 
 const CustomDrawercontent = (props) => {
   return (
@@ -26,6 +27,11 @@ const CustomDrawercontent = (props) => {
           label="Close Drawer"
           onPress={() => props.navigation.closeDrawer()}
         />
+        <DrawerItem
+          // icon={}
+          label="Logout"
+          onPress={() => props.logout()}
+        />
       </DrawerContentScrollView>
     </ScrollView>
   );
@@ -34,11 +40,15 @@ const CustomDrawercontent = (props) => {
 const Drawer = createDrawerNavigator();
 
 const AppDrawer = () => {
+  const { handleLogout } = useContext(AuthContext);
+
   return (
     <>
       <Drawer.Navigator
         backBehavior="history"
-        drawerContent={(props) => <CustomDrawercontent {...props} />}
+        drawerContent={(props) => (
+          <CustomDrawercontent logout={handleLogout} {...props} />
+        )}
       >
         <Drawer.Screen name="Home" component={Home} />
         <Drawer.Screen name="Contact" component={Contact} />
