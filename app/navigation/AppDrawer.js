@@ -7,10 +7,9 @@ import {
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
-
-import Home from "../scenes/Home";
 import Contact from "../scenes/Contact";
 import AuthContext from "./AuthProvider";
+import CameraStack from "./CameraStack/CameraStack";
 
 const CustomDrawercontent = (props) => {
   return (
@@ -50,7 +49,7 @@ const AppDrawer = () => {
           <CustomDrawercontent logout={handleLogout} {...props} />
         )}
       >
-        <Drawer.Screen name="Home" component={Home} />
+        <Drawer.Screen name="Home" component={CameraStack} />
         <Drawer.Screen name="Contact" component={Contact} />
       </Drawer.Navigator>
     </>

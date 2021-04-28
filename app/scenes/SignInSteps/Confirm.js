@@ -1,14 +1,11 @@
 import React from 'react'
 import { View,StyleSheet,Button,Text } from 'react-native'
-import Header from '../components/Header'
 
-const Home = ({navigation}) => {
+const Confirm = ({navigation}) => {
     return (
         <View style={styles.container}>
-            <Header title="Home" navigation={navigation}></Header>
             <View style={styles.content}> 
-                <Text style={styles.text}>Home is here</Text>
-                <Button title="Camera" onPress={()=>navigation.navigate("Camera")} />
+                <Text style={styles.text}>Confirm is here</Text>
             </View>
         </View>
     )
@@ -32,4 +29,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default Home
+export default Confirm
