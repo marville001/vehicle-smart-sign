@@ -10,13 +10,14 @@ import {
 import Contact from "../scenes/Contact";
 import AuthContext from "./AuthProvider";
 import CameraStack from "./CameraStack/CameraStack";
+import { colors } from "../constants/theme";
 
 const CustomDrawercontent = (props) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.drawerHeader}>
         <View>
-          <Text style={styles.drawerHeaderText}>Drawer Menu</Text>
+          <Text style={styles.drawerHeaderText}>Smart Sign</Text>
         </View>
       </View>
       <DrawerContentScrollView {...props}>
@@ -48,6 +49,14 @@ const AppDrawer = () => {
         drawerContent={(props) => (
           <CustomDrawercontent logout={handleLogout} {...props} />
         )}
+        drawerContentOptions={{
+          activeTintColor: colors.accent,
+          inactiveTintColor:"#fff",
+          labelStyle:{
+            fontSize:20,
+            fontWeight:"bold"
+          }
+        }}
       >
         <Drawer.Screen name="Home" component={CameraStack} />
         <Drawer.Screen name="Contact" component={Contact} />
@@ -59,9 +68,10 @@ const AppDrawer = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.secondaryLight,
   },
   drawerHeader: {
-    backgroundColor: "#03cafc",
+    backgroundColor: colors.secondary,
     height: 150,
     alignItems: "center",
     justifyContent: "center",
@@ -70,7 +80,7 @@ const styles = StyleSheet.create({
   },
   drawerHeaderText: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: "bold",
   },
 });

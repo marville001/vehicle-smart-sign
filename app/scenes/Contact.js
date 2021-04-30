@@ -2,11 +2,11 @@ import React from 'react'
 
 import { View,StyleSheet,Button,Text } from 'react-native'
 import Header from '../components/Header'
+import { colors } from '../constants/theme'
 
 const Contact = ({navigation}) => {
     return (
         <View style={styles.container}>
-            <Header title="Contact" navigation={navigation}/>
             <View style={styles.content}>
                 <Text style={styles.text}>Contact is here</Text>
                 <Button title="Go Home" onPress={()=>navigation.goBack()} />
@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
         flex:1,
         alignItems:"center",
         justifyContent:"center",
-        backgroundColor:"#c203fc"
+        backgroundColor:colors.secondary
     },
     text:{
         fontSize: 20,

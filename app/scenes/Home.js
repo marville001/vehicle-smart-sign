@@ -4,6 +4,7 @@ import {
   StatusBar,
   TouchableOpacity,
   Text,
+  StyleSheet,
 } from "react-native";
 import { colors } from "../constants/theme";
 import { Ionicons, Feather as Icon } from "@expo/vector-icons";
@@ -32,7 +33,9 @@ const Home = ({ navigation }) => {
         <Text style={styles.welcomeText}>SmartSign</Text>
       </View>
       <View style={styles.indicatorContainer}>
-          <Icon name="camera" size={30}/>
+        <View style={styles.indicatorContent}>
+            <Icon name="arrow-down" size={30}/>
+        </View>
       </View>
       <View style={styles.buttons}>
       <TouchableOpacity style={styles.entryButton} onPress={() => navigation.navigate("Camera", {action:"Entry"})}>
@@ -97,6 +100,22 @@ const styles = StyleSheet.create({
       fontSize:16,
       fontWeight:"500",
       color: colors.primary
+  },indicatorContainer:{
+      alignItems:"center",
+      marginTop: 100,
+      shadowRadius:10, 
+      shadowColor: "#eee",
+      shadowOpacity: 0.4,
+      shadowOffset: {height: 10}
+  },
+  indicatorContent:{
+      width: 50,
+      height: 50,
+      borderRadius: 100,
+      backgroundColor: "white",
+      alignItems: "center",
+      justifyContent:"center"
+
   }
 });
 
