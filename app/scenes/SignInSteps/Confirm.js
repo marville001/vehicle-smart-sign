@@ -1,5 +1,5 @@
 import React from "react";
-import { View, StyleSheet, Button, Text } from "react-native";
+import { View, StyleSheet, Button, Text, Image } from "react-native";
 
 const Confirm = ({ navigation, route }) => {
   const url = route.params.photoUrl;
@@ -8,6 +8,7 @@ const Confirm = ({ navigation, route }) => {
       <View style={styles.content}>
         <Text style={styles.text}>Confirm is here</Text>
         <Text style={styles.text}>Url : {url}</Text>
+        <Image source={{uri: url}} style={{width:500, height:300}} resizeMode="cover"/>
       </View>
     </View>            
   );
