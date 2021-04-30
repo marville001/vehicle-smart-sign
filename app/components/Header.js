@@ -2,6 +2,7 @@ import React from "react";
 
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
+import { colors } from "../constants/theme";
 
 const Header = ({ navigation, title }) => {
   const openMenu = () => {
@@ -21,12 +22,13 @@ const Header = ({ navigation, title }) => {
 
 const styles = StyleSheet.create({
   header: {
-    marginTop: 26,
+    marginTop:0,
     width: "100%",
     height: 60,
     flexDirection: "row",
     alignContent: "center",
     justifyContent: "center",
+    backgroundColor: colors.accent
   },
   headerTitle: {
     flexDirection: "row",

@@ -14,21 +14,13 @@ import {
 import IconButton from "../../components/IconButton";
 const { width: wWidth, height: wHeight } = Dimensions.get("window");
 
-const whiteBlcProps = [
-  { id: "auto", property: "Auto" },
-  { id: "sunny", property: "Sunny" },
-  { id: "cloudy", property: "Cloudy" },
-  { id: "shadow", property: "Shadow" },
-  { id: "incandescent", property: "Incandescent" },
-  { id: "fluorescent", property: "Fluorescent" },
-];
-
 const initialState = {
   whbalance: "auto",
   cameraType: "back",
   flash: "off",
   zoomValue: 0,
 };
+
 function reducer(state = initialState, action: { type: string; payload: any }) {
   switch (action.type) {
     case "@type/WH_BALANCE":
@@ -49,8 +41,14 @@ function reducer(state = initialState, action: { type: string; payload: any }) {
   }
 }
 
-export default () => {
+const CameraScreen = ({ navigation, route }) => {
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [confirm, setConfirm] = useState(false);
+  const [url, setUrl] = useState("");
+
+  console.log(navigation);
+  
+  const {action} = route.params;
   // Use Reducer
   const [state, dispatch] = useReducer(reducer, initialState);
   const { cameraType, whbalance, flash, zoomValue } = state;
@@ -65,12 +63,13 @@ export default () => {
       //console.log(cam.current.getSupportedRatiosAsync());
 
       const source = photo.uri;
-
+      setUrl(source);
+      setConfirm(true);
       console.log("Photo source: ", source);
 
-      // cam.current.pausePreview();
+      cam.current.pausePreview();
       // await handleSave(source);
-      cam.current.resumePreview();
+      // cam.current.resumePreview();
     }
   };
 
@@ -133,18 +132,27 @@ export default () => {
     });
   };
 
+  const _confirm = () => {
+    if (cam.current) {
+      cam.current.resumePreview();
+    }
+
+    navigation.navigate("Confirm", { photoUrl: url });
+    setConfirm(false);
+  };
+
   //console.log(cam.current);
   return (
     <View style={{ flex: 1 }}>
       <StatusBar />
       <Camera
         zoom={zoomValue}
-        whiteBalance={whbalance}
         flashMode={flash}
         ref={cam}
         style={{ flex: 1 }}
         type={cameraType}
       >
+        {/* Header back button */}
         <View
           style={{
             backgroundColor: "transparent",
@@ -155,17 +163,25 @@ export default () => {
           <View style={{ padding: 20 }}>
             <ScrollView>
               <IconButton
-                icon={flash === "on" ? "zap" : "zap-off"}
-                onPress={_toggleFlash}
+                icon="chevron-left"
+                onPress={() => navigation.navigate("Home")}
               />
             </ScrollView>
           </View>
         </View>
+
+        {/* Action Text */}
+        <View style={{alignItems:"center"}}>
+          <Text style={{color:"#fff",fontSize:40, opacity:.6}}>{action}</Text>
+        </View>
+
+        {/* Slider */}
         <View
           style={{
-            position: "relative",
-            top: 450,
-            width: wWidth,
+            transform: [{ rotate: "-90deg" }],
+            flex: 0.6,
+            alignItems: "flex-start",
+            justifyContent: "flex-end",
           }}
         >
           <Slider
@@ -180,6 +196,8 @@ export default () => {
             maximumTrackTintColor="#000000"
           />
         </View>
+
+        {/* Buttons */}
         <View
           style={{
             position: "absolute",
@@ -194,13 +212,24 @@ export default () => {
         >
           <IconButton
             icon="refresh-cw"
-            size={30}
+            size={28}
             onPress={_handleCameraToggle}
           />
-          <IconButton icon="camera" size={50} onPress={_takePicture} />
-          <IconButton icon="x" size={35} onPress={() => true} />
+          {confirm ? (
+            <IconButton icon="check" size={50} onPress={_confirm} />
+          ) : (
+            <IconButton icon="camera" size={50} onPress={_takePicture} />
+          )}
+          <IconButton
+            icon={flash === "on" ? "zap" : "zap-off"}
+            size={30}
+            onPress={_toggleFlash}
+          />
         </View>
+      
       </Camera>
     </View>
   );
-}
+};
+
+export default CameraScreen;

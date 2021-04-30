@@ -10,24 +10,74 @@ import {
 } from "react-native";
 import Loading from "../components/Loading";
 import AuthContext from "../navigation/AuthProvider";
+import { colors } from "../constants/theme";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isValid, setIsValid] = useState(false);
 
-  const { handleLogin, isLoading } = useContext(AuthContext);
+  const { handleLogin, isLoading, loginError } = useContext(AuthContext);
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  const handleSubmit = () => {
+    validateInputs();
+    if (isValid) {
+      handleLogin(email, password);
+    }
+  };
+
+  const unsetError = () => {
+    setTimeout(() => {
+      setError("");
+    }, 1000);
+  };
+
+  const validateInputs = () => {
+    if (email == "" || password == "") {
+      setIsValid(false);
+      setError("All fields are required!");
+      unsetError();
+    } else if (password.length < 8) {
+      setIsValid(false);
+      setError("Passoword have a minimum of 8 chars!");
+      unsetError();
+    } else if (
+      !/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(
+        email
+      )
+    ) {
+      setIsValid(false);
+      setError("Invalid email!");
+      unsetError();
+    } else {
+      unsetError();
+      setIsValid(true);
+    }
+  };
+
+  // if (isLoading) {
+  //   return <Loading />;
+  // }
   return (
     <TouchableWithoutFeedback
       onPress={() => {
-        //Keyboard.dismiss();
+        Keyboard.dismiss();
       }}
     >
       <View style={styles.container}>
         <Text style={styles.logo}>SmartSign</Text>
+        {error !== null && (
+          <View style={{ padding: 10 }}>
+            <Text style={{ color: "red" }}>{error}</Text>
+          </View>
+        )}
+
+        {loginError !== null && (
+          <View style={{ padding: 10 }}>
+            <Text style={{ color: "red" }}>{loginError}</Text>
+          </View>
+        )}
         <View style={styles.inputView}>
           <TextInput
             style={styles.inputText}
@@ -51,7 +101,7 @@ const Login = () => {
         </TouchableOpacity>
         <TouchableOpacity
           disabled={isLoading ? true : false}
-          onPress={() => handleLogin(email, password)}
+          onPress={handleSubmit}
           style={styles.loginBtn}
         >
           {isLoading ? (
@@ -71,19 +121,19 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#003f5c",
+    backgroundColor: colors.secondary,
     alignItems: "center",
     justifyContent: "center",
   },
   logo: {
     fontWeight: "bold",
     fontSize: 50,
-    color: "#fb5b5a",
+    color: colors.accent,
     marginBottom: 40,
   },
   inputView: {
     width: "80%",
-    backgroundColor: "#465881",
+    backgroundColor: colors.secondaryLight,
     borderRadius: 25,
     height: 50,
     marginBottom: 20,
@@ -100,7 +150,7 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     width: "80%",
-    backgroundColor: "#fb5b5a",
+    backgroundColor: colors.accent,
     borderRadius: 25,
     height: 50,
     alignItems: "center",

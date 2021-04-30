@@ -1,19 +1,17 @@
-import React, {useContext, useState, useEffect} from 'react';
-import {NavigationContainer} from '@react-navigation/native';
+import React, { useContext, useState, useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
 
 import firebase from "firebase";
 import "firebase/auth";
-import firebaseConfig from '../config/firebaseConfig';
+import firebaseConfig from "../config/firebaseConfig";
 
-
-import AuthStack from './AuthStack';
-import AppDrawer from './AppDrawer';
-import Loading from '../components/Loading';
-import AuthContext from './AuthProvider';
+import AuthStack from "./AuthStack";
+import AppDrawer from "./AppDrawer";
+import Loading from "../components/Loading";
+import AuthContext from "./AuthProvider";
 
 const Routes = () => {
-
-  const {user, setUser} = useContext(AuthContext);
+  const { user, setUser } = useContext(AuthContext);
   const [initializing, setInitializing] = useState(true);
 
   const onAuthStateChanged = (user) => {
@@ -22,7 +20,7 @@ const Routes = () => {
   };
 
   useEffect(() => {
-    firebase.initializeApp(firebaseConfig);
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
     const subscriber = firebase.auth().onAuthStateChanged(onAuthStateChanged);
     return subscriber; // unsubscribe on unmount
   }, []);

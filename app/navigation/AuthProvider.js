@@ -7,6 +7,7 @@ import "firebase/auth";
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginError, setLoginError] = useState("");
 
   const handleLogin = async (email, password) => {
     setIsLoading(true);
@@ -15,7 +16,11 @@ const AuthProvider = ({ children }) => {
 
       setIsLoading(false);
     } catch (error) {
-      console.log(error);
+      if(error.code =="auth/user-not-found"){
+        setLoginError("Invalid email or Password");
+      }else{
+        setLoginError("Failed to login. Try again later");
+      }
       setIsLoading(false);
     }
   };
@@ -30,7 +35,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ handleLogin, handleLogout, user, setUser, isLoading }}
+      value={{ handleLogin, loginError, handleLogout, user, setUser, isLoading }}
     >
       {children}
     </AuthContext.Provider>
