@@ -55,7 +55,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
   },
   header: {
-    marginTop: StatusBar.currentHeight,
+    // marginTop: StatusBar.currentHeight,
     width: "100%",
     height: 60,
     flexDirection: "row",
