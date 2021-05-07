@@ -11,7 +11,7 @@ import {
 } from "@react-navigation/drawer";
 
 import Home from "../scenes/Home";
-import Contact from "../scenes/Contact";
+import Profile from "../scenes/Profile";
 
 const CustomDrawercontent = (props) => {
   return (
@@ -43,7 +43,7 @@ const DrawerNavigation = () => {
         drawerContent={(props) => <CustomDrawercontent {...props} />}
       >
         <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Contact" component={Contact} />
+        <Drawer.Screen name="Profile" component={Profile} />
       </Drawer.Navigator>
     </>
   );

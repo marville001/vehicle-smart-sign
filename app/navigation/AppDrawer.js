@@ -7,7 +7,7 @@ import {
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
-import Contact from "../scenes/Contact";
+import Profile from "../scenes/Profile";
 import AuthContext from "./AuthProvider";
 import CameraStack from "./CameraStack/CameraStack";
 import { colors } from "../constants/theme";
@@ -59,7 +59,7 @@ const AppDrawer = () => {
         }}
       >
         <Drawer.Screen name="Home" component={CameraStack} />
-        <Drawer.Screen name="Contact" component={Contact} />
+        <Drawer.Screen name="Profile" component={Profile} />
       </Drawer.Navigator>
     </>
   );

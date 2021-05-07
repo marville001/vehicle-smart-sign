@@ -4,11 +4,11 @@ import { View,StyleSheet,Button,Text } from 'react-native'
 import Header from '../components/Header'
 import { colors } from '../constants/theme'
 
-const Contact = ({navigation}) => {
+const Profile = ({navigation}) => {
     return (
         <View style={styles.container}>
             <View style={styles.content}>
-                <Text style={styles.text}>Contact is here</Text>
+                <Text style={styles.text}>Profile is here</Text>
                 <Button title="Go Home" onPress={()=>navigation.goBack()} />
             </View>
         </View>
@@ -36,4 +36,4 @@ const styles = StyleSheet.create({
 })
 
 
-export default Contact
+export default Profile
