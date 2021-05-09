@@ -7,7 +7,7 @@ import {
   StyleSheet,
 } from "react-native";
 import { colors } from "../constants/theme";
-import { Ionicons, Feather as Icon } from "@expo/vector-icons";
+import { Feather as Icon } from "@expo/vector-icons";
 
 const Home = ({ navigation }) => {
   React.useEffect(() => {
@@ -110,7 +110,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary,
   },
   header: {
-    marginTop: StatusBar.currentHeight,
+    // marginTop: StatusBar.currentHeight,
     width: "100%",
     paddingHorizontal: 30,
     backgroundColor: colors.accent,

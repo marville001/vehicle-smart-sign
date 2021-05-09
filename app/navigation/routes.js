@@ -6,9 +6,9 @@ import "firebase/auth";
 import firebaseConfig from "../config/firebaseConfig";
 
 import AuthStack from "./AuthStack";
-import AppDrawer from "./AppDrawer";
+import AppDrawer from "./main_navigation/AppDrawer";
 import Loading from "../components/Loading";
-import AuthContext from "./AuthProvider";
+import AuthContext from "../provider/AuthProvider";
 
 const Routes = () => {
   const { user, setUser } = useContext(AuthContext);

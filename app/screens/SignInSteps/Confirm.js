@@ -31,7 +31,7 @@ const Confirm = ({ navigation, route }) => {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.icon}
-          onPress={() => navigation.navigate("Home")}
+          onPress={() => navigation.navigate("EntryHome")}
         >
           <Icon name="chevron-left" size={30} color="white" />
         </TouchableOpacity>

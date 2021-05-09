@@ -1,24 +1,22 @@
-import React from "react";
-
+import React, { useContext } from "react";
 import { View, StyleSheet, ScrollView, Text } from "react-native";
 
-import { NavigationContainer } from "@react-navigation/native";
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
   DrawerItemList,
   DrawerItem,
 } from "@react-navigation/drawer";
-
-import Home from "../scenes/Home";
-import Profile from "../scenes/Profile";
+import AuthContext from "../../provider/AuthProvider";
+import { colors } from "../../constants/theme";
+import AppTabScreen from "./AppTabScreen";
 
 const CustomDrawercontent = (props) => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.drawerHeader}>
         <View>
-          <Text style={styles.drawerHeaderText}>Drawer Menu</Text>
+          <Text style={styles.drawerHeaderText}>Smart Sign</Text>
         </View>
       </View>
       <DrawerContentScrollView {...props}>
@@ -28,6 +26,11 @@ const CustomDrawercontent = (props) => {
           label="Close Drawer"
           onPress={() => props.navigation.closeDrawer()}
         />
+        <DrawerItem
+          // icon={}
+          label="Logout"
+          onPress={() => props.logout()}
+        />
       </DrawerContentScrollView>
     </ScrollView>
   );
@@ -35,15 +38,26 @@ const CustomDrawercontent = (props) => {
 
 const Drawer = createDrawerNavigator();
 
-const DrawerNavigation = () => {
+const AppDrawer = () => {
+  const { handleLogout } = useContext(AuthContext);
+
   return (
     <>
       <Drawer.Navigator
         backBehavior="history"
-        drawerContent={(props) => <CustomDrawercontent {...props} />}
+        drawerContent={(props) => (
+          <CustomDrawercontent logout={handleLogout} {...props} />
+        )}
+        drawerContentOptions={{
+          activeTintColor: colors.accent,
+          inactiveTintColor:"#fff",
+          labelStyle:{
+            fontSize:20,
+            fontWeight:"bold"
+          }
+        }}
       >
-        <Drawer.Screen name="Home" component={Home} />
-        <Drawer.Screen name="Profile" component={Profile} />
+        <Drawer.Screen name="Home" component={AppTabScreen} />
       </Drawer.Navigator>
     </>
   );
@@ -52,9 +66,10 @@ const DrawerNavigation = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: colors.secondaryLight,
   },
   drawerHeader: {
-    backgroundColor: "#03cafc",
+    backgroundColor: colors.secondary,
     height: 150,
     alignItems: "center",
     justifyContent: "center",
@@ -63,9 +78,9 @@ const styles = StyleSheet.create({
   },
   drawerHeaderText: {
     color: "#fff",
-    fontSize: 24,
+    fontSize: 30,
     fontWeight: "bold",
   },
 });
 
-export default DrawerNavigation;
+export default AppDrawer;

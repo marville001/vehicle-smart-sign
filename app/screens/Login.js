@@ -9,7 +9,7 @@ import {
   Keyboard,
 } from "react-native";
 import Loading from "../components/Loading";
-import AuthContext from "../navigation/AuthProvider";
+import AuthContext from "../provider/AuthProvider";
 import { colors } from "../constants/theme";
 
 const Login = () => {

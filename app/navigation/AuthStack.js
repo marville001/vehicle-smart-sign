@@ -1,8 +1,8 @@
 import React from 'react'
 
-import Login from "../scenes/Login";
-import { createStackNavigator } from "@react-navigation/stack";
-import AppDrawer from './AppDrawer';
+import Login from "../screens/Login";
+import { createStackNavigator } from "@react-navigation/stack"
+import AppTabScreen from './main_navigation/AppTabScreen';
 
 const AuthStack = () => {
 
@@ -16,7 +16,7 @@ const AuthStack = () => {
           }}
         >
           <Stack.Screen name="Login" component={Login} />
-          <Stack.Screen name="Home" component={AppDrawer} />
+          <Stack.Screen name="Home" component={AppTabScreen} />
         </Stack.Navigator>
     )
 }
