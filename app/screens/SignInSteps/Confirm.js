@@ -1,4 +1,4 @@
-import React from "react";
+import React, { createRef } from "react";
 import {
   View,
   StyleSheet,
@@ -10,6 +10,7 @@ import {
 import { colors } from "../../constants/theme";
 import { Feather as Icon } from "@expo/vector-icons";
 import axios from "axios";
+import ConfirmBottomPopup from "../../components/ConfirmBottomPopup";
 
 const Confirm = ({ navigation, route }) => {
   const url = route.params.photoUrl;
@@ -18,13 +19,24 @@ const Confirm = ({ navigation, route }) => {
     StatusBar.setBackgroundColor(colors.secondary);
   }, []);
 
-  const extractPlate = async () => {
-    try {
-      const data = await axios.get("http://0.0.0.0:5000");
-    } catch (error) {
-      alert(error);
-    }
+  let popupRef = createRef();
+
+  const extractPlate = () => {
+    // try {
+    //   const data = await axios.get("http://0.0.0.0:5000");
+    // } catch (error) {
+    //   alert(error);
+    // }
+    onOpenPopup()
   };
+  
+  const onClosePopup = ()=>{
+    popupRef.close();
+  }
+
+  const onOpenPopup = ()=>{
+    popupRef.show();
+  }
 
   return (
     <View style={styles.container}>
@@ -108,9 +120,10 @@ const Confirm = ({ navigation, route }) => {
           </Text>
         </TouchableOpacity>
       </View>
-      <View>
-        <Text>Please enter correct plate</Text>
-      </View>
+      <ConfirmBottomPopup 
+      ref={(target) => (popupRef = target)}
+      onTouchOutside={onClosePopup}
+      />
     </View>
   );
 };

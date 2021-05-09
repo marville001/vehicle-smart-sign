@@ -89,13 +89,13 @@ const Home = ({ navigation }) => {
       <View style={styles.buttons}>
         <TouchableOpacity
           style={styles.entryButton}
-          onPress={() => navigation.navigate("Camera", { action: "Entry" })}
+          onPress={() => navigation.navigate("EntryHome")}
         >
           <Text style={styles.buttonText}>Entry</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.entryButton, styles.exitButton]}
-          onPress={() => navigation.navigate("Camera", { action: "Exit" })}
+          onPress={() => navigation.navigate("EntryHome")}
         >
           <Text style={styles.buttonText}>Exit</Text>
         </TouchableOpacity>
