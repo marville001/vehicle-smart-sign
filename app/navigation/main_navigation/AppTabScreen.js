@@ -5,6 +5,8 @@ import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityI
 import Home from '../../screens/Home';
 import Profile from '../../screens/Profile';
 import EntryStack from '../sub_navigation/EntryStack';
+import { colors } from '../../constants/theme';
+import AddVehicleStack from '../sub_navigation/AddVehicleStack';
 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -14,7 +16,7 @@ const AppTabScreen = () => {
     <Tab.Navigator
       initialRouteName="Feed"
       activeColor="#e91e63"
-      barStyle={{ backgroundColor: 'tomato' }}
+      barStyle={{ backgroundColor: colors.secondary }}
     >
       <Tab.Screen
         name="Home"
@@ -33,6 +35,16 @@ const AppTabScreen = () => {
           tabBarLabel: 'Entry',
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="bell" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Add Vehicle"
+        component={AddVehicleStack}
+        options={{
+          tabBarLabel: 'New',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="plus" color={color} size={26} />
           ),
         }}
       />

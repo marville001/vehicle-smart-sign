@@ -11,7 +11,7 @@ import { Feather as Icon } from "@expo/vector-icons";
 
 const Home = ({ navigation }) => {
   React.useEffect(() => {
-    StatusBar.setBackgroundColor(colors.accent);
+    StatusBar.setBackgroundColor(colors.secondary);
     // StatusBar.setTranslucent(true);
     // StatusBar.setHidden(true);
   }, []);
@@ -22,6 +22,7 @@ const Home = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      <StatusBar />
       <View style={styles.header}>
         <View>
           <Text
@@ -107,13 +108,13 @@ const Home = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondary,
+    backgroundColor: colors.primary,
   },
   header: {
     // marginTop: StatusBar.currentHeight,
     width: "100%",
     paddingHorizontal: 30,
-    backgroundColor: colors.accent,
+    backgroundColor: colors.secondary,
   },
 
   icon: {
@@ -127,7 +128,7 @@ const styles = StyleSheet.create({
   },
   welcomeText: {
     fontSize: 40,
-    color: colors.primary,
+    color: colors.secondary,
     fontWeight: "bold",
   },
   buttons: {
