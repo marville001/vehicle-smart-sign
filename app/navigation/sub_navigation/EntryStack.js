@@ -1,8 +1,9 @@
 import React from 'react'
 
 import { createStackNavigator } from "@react-navigation/stack";
-import Confirm from '../../screens/SignInSteps/Confirm';
-import CameraScreen from '../../screens/SignInSteps/CameraScreen';
+
+import CameraScreen from '../../screens/Entry/CameraScreen';
+import Confirm from '../../screens/Entry/Confirm';
 
 const EntryStack = () => {
 

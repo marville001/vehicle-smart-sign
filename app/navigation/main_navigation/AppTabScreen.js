@@ -2,11 +2,13 @@ import React from 'react'
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import Home from '../../screens/Home';
+import { colors } from '../../constants/theme';
+
+import Home from '../../screens/Home/Home';
 import Profile from '../../screens/Profile';
 import EntryStack from '../sub_navigation/EntryStack';
-import { colors } from '../../constants/theme';
 import AddVehicleStack from '../sub_navigation/AddVehicleStack';
+import SearchStack from '../sub_navigation/SearchStack';
 
 
 const Tab = createMaterialBottomTabNavigator();
@@ -34,7 +36,17 @@ const AppTabScreen = () => {
         options={{
           tabBarLabel: 'Entry',
           tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="bell" color={color} size={26} />
+            <MaterialCommunityIcons name="camera" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Search Vehicle"
+        component={SearchStack}
+        options={{
+          tabBarLabel: 'Search',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="magnify" color={color} size={26} />
           ),
         }}
       />

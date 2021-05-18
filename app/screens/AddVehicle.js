@@ -33,14 +33,14 @@ const AddVehicle = ({ navigation }) => {
 
       <View style={styles.form}>
         <ScrollView>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Model</Text>
-            <TextInput style={styles.input} placeholder="Model..." />
-          </View>
-          <View style={styles.inputContainer}>
-            <Text style={styles.label}>Color</Text>
-            <TextInput style={styles.input} placeholder="Email" />
-          </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Model</Text>
+              <TextInput style={styles.input} placeholder="Model..." />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Color</Text>
+              <TextInput style={styles.input} placeholder="Email" />
+            </View>
           <View style={styles.inputContainer}>
             <Text style={styles.label}>Number Plate</Text>
             <TextInput style={styles.input} placeholder="Email" />
@@ -71,10 +71,11 @@ const styles = StyleSheet.create({
   form: {
     flex: 1,
     paddingHorizontal: 30,
-    flexDirection: "row"
+    flexDirection: "row",
   },
   inputContainer: {
-    marginVertical: 10,width:"50%"
+    marginVertical: 10,
+    flex: 1,
   },
   input: {
     borderWidth: 1,

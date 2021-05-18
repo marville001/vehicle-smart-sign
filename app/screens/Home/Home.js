@@ -6,7 +6,7 @@ import {
   Text,
   StyleSheet,
 } from "react-native";
-import { colors } from "../constants/theme";
+import { colors } from "../../constants/theme";
 import { Feather as Icon } from "@expo/vector-icons";
 
 const Home = ({ navigation }) => {
