@@ -1,40 +1,46 @@
+import axios from "axios";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Button, Image } from "react-native";
+import { colors } from "../../constants/theme";
 
 const Confirm = (props) => {
-  const selectedImagePath = props.navigation.getParam("photoUrl");
+  const imageUri = props.route.params.imagePath;
+  console.log("Image: ", imageUri);
 
   const [vehicleId, setVehicleId] = useState("");
 
   async function confirmHandler() {
-    let filename = selectedImagePath.split("/").pop();
     // const { manifest } = Constants;
     // const apiuri = `http://${manifest.debuggerHost.split(':').shift()}:2040` + '/anpr';
     // console.log(apiuri)
 
-    let match = /\.(\w+)$/.exec(filename);
+    let match = /\.(\w+)$/.exec(imageUri.split("/").pop());
     let type = match ? `image/${match[1]}` : `image`;
+
+    console.log(type);
 
     let formData = new FormData();
     formData.append("image", {
-      uri: selectedImagePath,
-      name: filename,
+      uri : imageUri,
       type,
-    });
+      name: imageUri.split("/").pop()
+     });
 
     console.log("Extracting... ");
 
     try {
-      const response = await fetch("http://172.16.59.107:2040/anpr", {
-        method: "POST",
-        body: formData,
-        headers: {
-          "content-type": "multipart/form-data",
-        },
-      });
-      const responseJson = await response.json();
-      console.log(responseJson);
-      setVehicleId(responseJson["vechileId"]);
+      const response = await axios.post(
+        "http://192.168.137.101:2040/anpr",
+        formData,
+        {
+          headers: {
+            "content-type": "multipart/form-data",
+          },
+        }
+      );
+      // const responseJson = await response.json();
+      console.log(response);
+      setVehicleId(response["vechileId"]);
     } catch (error) {
       console.log(error);
     }
@@ -64,7 +70,7 @@ const Confirm = (props) => {
   return (
     <View style={styles.container}>
       <View style={styles.imageView}>
-        <Image source={{ uri: selectedImagePath }} style={styles.image} />
+        <Image source={{ uri: imageUri }} style={styles.image} />
       </View>
       <View style={styles.buttonView}>
         <Button

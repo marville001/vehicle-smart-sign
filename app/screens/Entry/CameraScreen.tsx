@@ -4,22 +4,18 @@ import ImageSelector from "../../components/ImageSelector";
 
 const CameraScreen = (props) => {
   const selectedImageHandler = (imagePath) => {
-    console.log(imagePath);
-    props.navigation.navigate({
-      routeName: "GetResults",
-      params: {
-        imagePath: imagePath,
-      },
-    });
+    props.navigation.navigate("Confirm", {imagePath: imagePath});
   };
 
   return (
     <View style={styles.container}>
       <View style={styles.textView}>
         <Text style={styles.welcomeText}>
-          Welcome to ANPR - Automatic Number Plate Recognition app{"\n"}
+          Welcome to SmartSign{"\n"}
+          {"\n"}
           <Text style={styles.actionText}>
-            Click a photo or select one from camera roll{"\n"}
+            Click a photo or select one{"\n"}
+            {"\n"}
           </Text>
           <Text style={styles.actionText}>
             Ensure vechile registration number is well visible
@@ -35,8 +31,6 @@ const CameraScreen = (props) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // justifyContent: "center",
-    alignItems: "center",
     margin: 10,
   },
   textView: {
@@ -44,7 +38,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 25,
   },
   welcomeText: {
-    fontSize: 20,
+    fontSize: 25,
     fontWeight: "bold",
     textAlign: "center",
   },

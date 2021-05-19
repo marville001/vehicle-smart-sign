@@ -1,22 +1,30 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Button, StyleSheet, Alert } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
 import { colors } from "../constants/theme";
+import { Camera } from "expo-camera";
 
 const ImageSelector = (props) => {
+  const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    (async () => {
+      const { status } = await Camera.requestPermissionsAsync();
+      setStatus(status === "granted"?"granted":"not");
+    })();
+  }, [status]);
 
   const buttonPressHandler = async (buttonType) => {
     let selectedImage;
-    
+
     const imageProperties = {
       allowsEditing: true,
       aspect: [4, 3],
     };
 
     if (buttonType === "camera") {
-      const resultCamera = await Permissions.askAsync(Permissions.CAMERA);
-      if (resultCamera.status !== "granted") {
+      if (status !== "granted") {
         Alert.alert(
           "Insufficient privilege",
           "Permission required to access camera",
@@ -27,7 +35,8 @@ const ImageSelector = (props) => {
         selectedImage = await ImagePicker.launchCameraAsync(imageProperties);
       }
     } else {
-      const resultMedia = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      const resultMedia =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
       if (!resultMedia) {
         Alert.alert(
           "Insufficient privilege",
@@ -43,30 +52,30 @@ const ImageSelector = (props) => {
     }
 
     if (selectedImage.cancelled) {
-        return;
+      return;
     }
     props.onSelect(selectedImage.uri);
-  }
+  };
 
   return (
     <View>
       <View style={styles.buttonView}>
         <Button
-          title="Click Photo"
-          onPress={()=>buttonPressHandler("camera")}
+          title="Take Picture"
+          onPress={() => buttonPressHandler("camera")}
           color={colors.accent}
         />
       </View>
       <View style={styles.buttonView}>
         <Button
-          title="Camera Roll"
-          onPress={()=>buttonPressHandler("camera_roll")}
-          color={colors.accent}
+          title="Select Picture"
+          onPress={() => buttonPressHandler("camera_roll")}
+          color={colors.secondary}
         />
       </View>
     </View>
   );
-}
+};
 
 const styles = StyleSheet.create({
   buttonView: {
