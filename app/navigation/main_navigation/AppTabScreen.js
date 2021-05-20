@@ -1,15 +1,14 @@
-import React from 'react'
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
+import React from "react";
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs";
+import MaterialCommunityIcons from "react-native-vector-icons/MaterialCommunityIcons";
 
-import { colors } from '../../constants/theme';
+import { colors } from "../../constants/theme";
 
-import Home from '../../screens/Home/Home';
-import Profile from '../../screens/Profile';
-import EntryStack from '../sub_navigation/EntryStack';
-import AddVehicleStack from '../sub_navigation/AddVehicleStack';
-import SearchStack from '../sub_navigation/SearchStack';
-
+import Home from "../../screens/Home/Home";
+import Profile from "../../screens/Profile";
+import EntryStack from "../sub_navigation/EntryStack";
+import AddVehicleStack from "../sub_navigation/AddVehicleStack";
+import SearchStack from "../sub_navigation/SearchStack";
 
 const Tab = createMaterialBottomTabNavigator();
 
@@ -24,19 +23,9 @@ const AppTabScreen = () => {
         name="Home"
         component={Home}
         options={{
-          tabBarLabel: 'Home',
+          tabBarLabel: "Home",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="home" color={color} size={26} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Entry"
-        component={EntryStack}
-        options={{
-          tabBarLabel: 'Entry',
-          tabBarIcon: ({ color }) => (
-            <MaterialCommunityIcons name="camera" color={color} size={26} />
           ),
         }}
       />
@@ -44,9 +33,19 @@ const AppTabScreen = () => {
         name="Search Vehicle"
         component={SearchStack}
         options={{
-          tabBarLabel: 'Search',
+          tabBarLabel: "Search",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="magnify" color={color} size={26} />
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Entry"
+        component={EntryStack}
+        options={{
+          tabBarLabel: "Entry",
+          tabBarIcon: ({ color, }) => (
+            <MaterialCommunityIcons name="camera" color={color} size={26} />
           ),
         }}
       />
@@ -54,7 +53,7 @@ const AppTabScreen = () => {
         name="Add Vehicle"
         component={AddVehicleStack}
         options={{
-          tabBarLabel: 'New',
+          tabBarLabel: "New",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="plus" color={color} size={26} />
           ),
@@ -64,7 +63,7 @@ const AppTabScreen = () => {
         name="Profile"
         component={Profile}
         options={{
-          tabBarLabel: 'Profile',
+          tabBarLabel: "Profile",
           tabBarIcon: ({ color }) => (
             <MaterialCommunityIcons name="account" color={color} size={26} />
           ),
@@ -72,6 +71,6 @@ const AppTabScreen = () => {
       />
     </Tab.Navigator>
   );
-}
+};
 
 export default AppTabScreen;

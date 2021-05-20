@@ -8,6 +8,7 @@ import {
 } from "react-native";
 import { colors } from "../../constants/theme";
 import { Feather as Icon } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Home = ({ navigation }) => {
   React.useEffect(() => {
@@ -20,8 +21,32 @@ const Home = ({ navigation }) => {
     navigation.openDrawer();
   };
 
+  const renderCard = (title, count, mt) => {
+    return (
+      <View style={[styles.gridItem, { marginTop: mt }]}>
+        <Text
+          style={{
+            fontSize: 20,
+          }}
+        >
+          {title}
+        </Text>
+        <Text
+          style={{
+            fontSize: 25,
+            color: colors.accent,
+            fontWeight: "bold",
+            paddingTop: 10,
+          }}
+        >
+          {count}
+        </Text>
+      </View>
+    );
+  };
+
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <StatusBar />
       <View style={styles.header}>
         <View>
@@ -57,36 +82,52 @@ const Home = ({ navigation }) => {
             style={{
               backgroundColor: colors.secondaryLight,
               marginTop: 20,
-              marginBottom:15,
+              marginBottom: 15,
               padding: 10,
               borderRadius: 10,
               flexDirection: "row",
             }}
-            onTouchEnd={()=>alert("search")}
+            onTouchEnd={() => alert("search")}
           >
             <Icon name="search" size={20} color={colors.primary} />
             <Text
               style={{
                 fontSize: 16,
                 color: colors.primary,
-                marginLeft:20
+                marginLeft: 20,
               }}
             >
               Search
             </Text>
           </View>
         </View>
-      </View>
-      {/* <View style={styles.headerText}>
-        <Text style={styles.welcomeText}>Welcome</Text>
-        <Text style={styles.welcomeText}>to</Text>
-        <Text style={styles.welcomeText}>SmartSign</Text>
-      </View> */}
-      <View style={styles.indicatorContainer}>
-        <View style={styles.indicatorContent}>
-          <Icon name="arrow-down" size={30} />
+
+        <View style={[styles.grid, { marginTop: 0 }]}>
+          {renderCard("Total", 100, 0)}
+          {renderCard("Today's Entry", 80, 0)}
+          {renderCard("Today's Exit", 30, 20)}
+          {renderCard("Current", 50, 20)}
         </View>
       </View>
+
+      <View
+        style={{
+          marginTop: 40,
+          alignItems:"center",
+          borderBottomWidth:2,
+          borderBottomColor:  colors.secondaryLight,
+          marginHorizontal:30,
+          paddingBottom:10,
+          marginBottom:10
+        }}
+      >
+        <Text style={{
+          fontSize:20,
+          color:colors.primary,
+          textTransform:"uppercase"
+        }}>Record Entry or Exit</Text>
+      </View>
+
       <View style={styles.buttons}>
         <TouchableOpacity
           style={styles.entryButton}
@@ -101,17 +142,16 @@ const Home = ({ navigation }) => {
           <Text style={styles.buttonText}>Exit</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.secondary,
   },
   header: {
-    // marginTop: StatusBar.currentHeight,
     width: "100%",
     paddingHorizontal: 30,
     backgroundColor: colors.secondary,
@@ -122,52 +162,47 @@ const styles = StyleSheet.create({
     left: 30,
     top: 15,
   },
-  headerText: {
-    marginHorizontal: 30,
-    alignItems: "center",
-  },
-  welcomeText: {
-    fontSize: 40,
-    color: colors.secondary,
-    fontWeight: "bold",
-  },
   buttons: {
     paddingHorizontal: 30,
-    position: "absolute",
-    left: 0,
-    right: 0,
-    bottom: 30,
+    flexDirection:"row"
   },
   entryButton: {
     backgroundColor: colors.accent,
     paddingVertical: 20,
     alignItems: "center",
+    flex:1,
     borderRadius: 10,
-    marginVertical: 10,
+    marginRight: 10,
   },
   exitButton: {
     backgroundColor: colors.secondaryLight,
+    marginRight:0
   },
   buttonText: {
     fontSize: 16,
     fontWeight: "500",
     color: colors.primary,
   },
-  indicatorContainer: {
-    alignItems: "center",
-    marginTop: 100,
-    shadowRadius: 10,
-    shadowColor: "#eee",
-    shadowOpacity: 0.4,
-    shadowOffset: { height: 10 },
+  grid: {
+    display: "flex",
+    flexDirection: "row",
+    flexWrap: "wrap",
+    alignItems: "baseline",
+    justifyContent: "space-between",
   },
-  indicatorContent: {
-    width: 50,
-    height: 50,
-    borderRadius: 100,
-    backgroundColor: "white",
+  gridItem: {
+    backgroundColor: colors.primary,
+    marginTop: 20,
+    width: 140,
+    minHeight: 100,
     alignItems: "center",
     justifyContent: "center",
+    borderRadius: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.44,
+    shadowRadius: 10,
+    elevation: 16,
   },
 });
 
