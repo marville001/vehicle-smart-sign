@@ -110,9 +110,6 @@ const Login = () => {
             <Text style={styles.loginText}>LOGIN</Text>
           )}
         </TouchableOpacity>
-        {/* <TouchableOpacity>
-        <Text style={styles.loginText}>Signup</Text>
-      </TouchableOpacity> */}
       </View>
     </TouchableWithoutFeedback>
   );
