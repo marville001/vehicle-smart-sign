@@ -28,6 +28,7 @@ const CustomDrawercontent = (props) => {
         />
         <DrawerItem
           // icon={}
+          style={{color:"#fff"}}
           label="Logout"
           onPress={() => props.logout()}
         />
@@ -53,9 +54,11 @@ const AppDrawer = () => {
           inactiveTintColor:"#fff",
           labelStyle:{
             fontSize:20,
-            fontWeight:"bold"
+            fontWeight:"bold",
+            color:"#fff"
           }
         }}
+
       >
         <Drawer.Screen name="Home" component={AppTabScreen} />
       </Drawer.Navigator>

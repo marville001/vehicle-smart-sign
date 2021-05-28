@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TouchableWithoutFeedback,
   Keyboard,
+  ActivityIndicator,
 } from "react-native";
 import Loading from "../components/Loading";
 import AuthContext from "../provider/AuthProvider";
@@ -30,7 +31,7 @@ const Login = () => {
   const unsetError = () => {
     setTimeout(() => {
       setError("");
-    }, 1000);
+    }, 5000);
   };
 
   const validateInputs = () => {
@@ -102,10 +103,12 @@ const Login = () => {
         <TouchableOpacity
           disabled={isLoading ? true : false}
           onPress={handleSubmit}
-          style={styles.loginBtn}
+          style={[styles.loginBtn,{
+            backgroundColor:isLoading ? "#e8e": colors.accent
+          }]}
         >
           {isLoading ? (
-            <Loading />
+            <Text style={styles.loginText}>Loading...</Text>
           ) : (
             <Text style={styles.loginText}>LOGIN</Text>
           )}
@@ -131,7 +134,7 @@ const styles = StyleSheet.create({
   inputView: {
     width: "80%",
     backgroundColor: colors.secondaryLight,
-    borderRadius: 25,
+    borderRadius: 15,
     height: 50,
     marginBottom: 20,
     justifyContent: "center",
@@ -147,8 +150,7 @@ const styles = StyleSheet.create({
   },
   loginBtn: {
     width: "80%",
-    backgroundColor: colors.accent,
-    borderRadius: 25,
+    borderRadius: 15,
     height: 50,
     alignItems: "center",
     justifyContent: "center",
