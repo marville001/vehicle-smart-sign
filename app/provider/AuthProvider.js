@@ -15,7 +15,7 @@ const AuthProvider = ({ children }) => {
       await firebase.auth().signInWithEmailAndPassword(email, password);
 
       setIsLoading(false);
-    } catch (error) {
+    } catch (error) {      
       if(error.code =="auth/user-not-found"){
         setLoginError("Invalid email or Password");
       }else{

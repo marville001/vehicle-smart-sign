@@ -1,5 +1,5 @@
 import { DrawerView } from "@react-navigation/drawer";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 
 import {
   View,
@@ -9,10 +9,12 @@ import {
   TextInput,
   StatusBar,
   Alert,
+  ActivityIndicator,
 } from "react-native";
 import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/theme";
+import MyContext from "../provider/ContextProvider";
 
 const AddVehicle = ({ navigation }) => {
   const [plate, setPlate] = useState("");
@@ -23,6 +25,9 @@ const AddVehicle = ({ navigation }) => {
   const [driverID, setDriverID] = useState("");
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
+
+  const { addVehicleSubmit, addError, addLoading, setAddError, msg } =
+    useContext(MyContext);
 
   const unsetError = () => {
     setTimeout(() => {
@@ -44,7 +49,7 @@ const AddVehicle = ({ navigation }) => {
       setIsValid(false);
       setError("All fields are required!");
       unsetError();
-    } else if (plate.length != 7) {
+    } else if (plate.length < 7) {
       setIsValid(false);
       setError("Invalid Number Plate.. should be 7 characters");
       unsetError();
@@ -57,20 +62,31 @@ const AddVehicle = ({ navigation }) => {
   const handleAddVehicle = () => {
     validateInputs();
 
-    if(isValid){
-      resetInputs()
+    if (isValid) {
+      setAddError("");
+      addVehicleSubmit({
+        plate: plate.toLowerCase(),
+        model: model.toLowerCase(),
+        make: make.toLowerCase(),
+        color: color.toLowerCase(),
+        driverName: driverName.toLowerCase(),
+        driverID: driverID.toLowerCase(),
+      });
+      if (msg.length > 0) {
+        Alert.alert("Success", msg, [{ text: "Ok", onPress: () => {} }]);
+        resetInputs();
+      }
     }
-   
   };
 
-  const resetInputs = ()=>{
-    setPlate("")
-    setModel("")
-    setMake("")
-    setColor("")
-    setDriverID("")
-    setDriverName("")
-  }
+  const resetInputs = () => {
+    setPlate("");
+    setModel("");
+    setMake("");
+    setColor("");
+    setDriverID("");
+    setDriverName("");
+  };
 
   useEffect(() => {
     if (error) Alert.alert("Error", error, [{ text: "Ok", onPress: () => {} }]);
@@ -96,6 +112,20 @@ const AddVehicle = ({ navigation }) => {
           >
             New Record
           </Text>
+        </View>
+        <View>
+          {addLoading && <ActivityIndicator size={"large"} color="#fff" />}
+          {addError ? (
+            <Text
+              style={{
+                fontSize: 18,
+                textAlign: "center",
+                color: colors.accent,
+              }}
+            >
+              {addError}
+            </Text>
+          ) : null}
         </View>
         <View style={styles.form}>
           <ScrollView
@@ -148,7 +178,7 @@ const AddVehicle = ({ navigation }) => {
                 style={styles.input}
                 placeholder=">"
                 placeholderTextColor={colors.primary}
-                onChangeText={(text) => setPlate(setDriverName)}
+                onChangeText={(text) => setDriverName(text)}
                 value={driverName}
               />
             </View>
@@ -171,8 +201,13 @@ const AddVehicle = ({ navigation }) => {
               <TouchableOpacity
                 onPress={handleAddVehicle}
                 style={styles.addBtn}
+                disabled={addLoading ? true : false}
               >
-                <Text style={{ color: "#fff", fontSize: 20 }}>Add</Text>
+                {addLoading ? (
+                  <Text style={{ color: "#fff", fontSize: 20 }}>Adding...</Text>
+                ) : (
+                  <Text style={{ color: "#fff", fontSize: 20 }}>Add</Text>
+                )}
               </TouchableOpacity>
             </View>
             <View style={{ height: 50 }}></View>
