@@ -110,7 +110,7 @@ const AddVehicle = ({ navigation }) => {
               textAlign: "center",
             }}
           >
-            New Record
+            New Vehicle
           </Text>
         </View>
         <View>
