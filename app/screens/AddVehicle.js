@@ -1,4 +1,5 @@
-import React from "react";
+import { DrawerView } from "@react-navigation/drawer";
+import React, { useEffect, useState } from "react";
 
 import {
   View,
@@ -7,12 +8,74 @@ import {
   Text,
   TextInput,
   StatusBar,
+  Alert,
 } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
+import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { colors } from "../constants/theme";
 
 const AddVehicle = ({ navigation }) => {
+  const [plate, setPlate] = useState("");
+  const [model, setModel] = useState("");
+  const [color, setColor] = useState("");
+  const [make, setMake] = useState("");
+  const [driverName, setDriverName] = useState("");
+  const [driverID, setDriverID] = useState("");
+  const [error, setError] = useState("");
+  const [isValid, setIsValid] = useState(false);
+
+  const unsetError = () => {
+    setTimeout(() => {
+      setError("");
+    }, 1000);
+  };
+
+  const validateInputs = () => {
+    let isValid = false;
+
+    if (
+      plate == "" ||
+      model == "" ||
+      color == "" ||
+      make == "" ||
+      driverName == "" ||
+      driverID == ""
+    ) {
+      setIsValid(false);
+      setError("All fields are required!");
+      unsetError();
+    } else if (plate.length != 7) {
+      setIsValid(false);
+      setError("Invalid Number Plate.. should be 7 characters");
+      unsetError();
+    } else {
+      unsetError();
+      setIsValid(true);
+    }
+  };
+
+  const handleAddVehicle = () => {
+    validateInputs();
+
+    if(isValid){
+      resetInputs()
+    }
+   
+  };
+
+  const resetInputs = ()=>{
+    setPlate("")
+    setModel("")
+    setMake("")
+    setColor("")
+    setDriverID("")
+    setDriverName("")
+  }
+
+  useEffect(() => {
+    if (error) Alert.alert("Error", error, [{ text: "Ok", onPress: () => {} }]);
+  }, [error]);
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -40,27 +103,13 @@ const AddVehicle = ({ navigation }) => {
             scrollIndicatorInsets={false}
           >
             <View style={styles.inputContainer}>
-              <Text style={styles.label}>Number Plate</Text>
+              <Text style={styles.label}>Number Plate (7 characters)</Text>
               <TextInput
                 style={styles.input}
                 placeholder=">"
                 placeholderTextColor={colors.primary}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Driver Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Driver ID</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
+                onChangeText={(text) => setPlate(text)}
+                value={plate}
               />
             </View>
             <View style={styles.inputContainer}>
@@ -69,6 +118,8 @@ const AddVehicle = ({ navigation }) => {
                 style={styles.input}
                 placeholder=">"
                 placeholderTextColor={colors.primary}
+                onChangeText={(text) => setModel(text)}
+                value={model}
               />
             </View>
             <View style={styles.inputContainer}>
@@ -77,6 +128,8 @@ const AddVehicle = ({ navigation }) => {
                 style={styles.input}
                 placeholder=">"
                 placeholderTextColor={colors.primary}
+                onChangeText={(text) => setMake(text)}
+                value={make}
               />
             </View>
             <View style={styles.inputContainer}>
@@ -85,17 +138,44 @@ const AddVehicle = ({ navigation }) => {
                 style={styles.input}
                 placeholder=">"
                 placeholderTextColor={colors.primary}
+                onChangeText={(text) => setColor(text)}
+                value={color}
               />
             </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Driver Name</Text>
+              <TextInput
+                style={styles.input}
+                placeholder=">"
+                placeholderTextColor={colors.primary}
+                onChangeText={(text) => setPlate(setDriverName)}
+                value={driverName}
+              />
+            </View>
+            <View style={styles.inputContainer}>
+              <Text style={styles.label}>Driver ID</Text>
+              <TextInput
+                style={styles.input}
+                placeholder=">"
+                placeholderTextColor={colors.primary}
+                onChangeText={(text) => setDriverID(text)}
+                value={driverID}
+              />
+            </View>
+
             <View
               style={{
                 marginTop: 20,
               }}
             >
-              <Button title="Add" />
+              <TouchableOpacity
+                onPress={handleAddVehicle}
+                style={styles.addBtn}
+              >
+                <Text style={{ color: "#fff", fontSize: 20 }}>Add</Text>
+              </TouchableOpacity>
             </View>
-            <View style={{height:50}}>
-            </View>
+            <View style={{ height: 50 }}></View>
           </ScrollView>
         </View>
       </View>
@@ -122,12 +202,20 @@ const styles = StyleSheet.create({
     borderColor: colors.primary,
     borderRadius: 5,
     color: colors.primary,
-    fontSize: 15,
+    fontSize: 17,
   },
   label: {
     fontSize: 17,
     marginBottom: 5,
     color: colors.accent,
+  },
+  addBtn: {
+    backgroundColor: colors.accent,
+    // height:50,
+    paddingVertical: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    borderRadius: 5,
   },
 });
 
