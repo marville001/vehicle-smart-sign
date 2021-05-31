@@ -9,29 +9,47 @@ const ContextProvider = ({ children }) => {
   const [addError, setAddError] = useState("");
   const [msg, setMsg] = useState("");
 
+  const update = (callback, mess) => {
+    callback(mess);
+    setTimeout(() => {
+      callback("");
+    }, 2000);
+  };
+
   const addVehicleSubmit = async (details) => {
     setAddLoading(true);
+    const plate = details.plate;
     try {
       const db = firebase.database();
       let ref = db.ref("/Vehicles");
-      await ref.push(details);
 
-      
+      ref.once("value", (snapshot) => {
+        var plates = [];
+
+        snapshot.forEach((snap) => {
+          let data = snap.val();
+
+          plates.push(data.plate);
+        });
+        if (plates.includes(plate)) {
+          update(setAddError, "This number plate is already registered.!");
+        } else {
+          ref.push(details);
+          update(setMsg, "Added successfully");
+        }
+      });
+
       setAddLoading(false);
-      setMsg("Added successfully");
     } catch (error) {
-        console.log("An error", error);
-      if (error.code == "auth/user-not-found") {
-        setAddError("Invalid email or Password");
-      } else {
-        setAddError("Failed to login. Try again later");
-      }
+      update(setAddError,"Failed add. Try again later");
       setAddLoading(false);
     }
   };
 
   return (
-    <MyContext.Provider value={{ addVehicleSubmit, addError, addLoading,setAddError ,msg}}>
+    <MyContext.Provider
+      value={{ addVehicleSubmit, addError, addLoading, setAddError, msg }}
+    >
       {children}
     </MyContext.Provider>
   );
