@@ -14,11 +14,11 @@ const CameraScreen = (props) => {
           Welcome to SmartSign{"\n"}
           {"\n"}
           <Text style={styles.actionText}>
-            Click a photo or select one{"\n"}
+            Take a picture or select one{"\n"}
             {"\n"}
           </Text>
           <Text style={styles.actionText}>
-            Ensure vechile registration number is well visible
+            Ensure vehicle registration number is well visible
           </Text>
         </Text>
       </View>
