@@ -2,6 +2,7 @@ import axios from "axios";
 import React, { useState } from "react";
 import { View, Text, StyleSheet, Button, Image } from "react-native";
 import { colors } from "../../constants/theme";
+import mime from "mime";
 
 const Confirm = (props) => {
   const imageUri = props.route.params.imagePath;
@@ -14,15 +15,15 @@ const Confirm = (props) => {
     // const apiuri = `http://${manifest.debuggerHost.split(':').shift()}:2040` + '/anpr';
     // console.log(apiuri)
 
-    let match = /\.(\w+)$/.exec(imageUri.split("/").pop());
-    let type = match ? `image/${match[1]}` : `image`;
+    // let match = /\.(\w+)$/.exec(imageUri.split("/").pop());
+    // let type = match ? `image/${match[1]}` : `image`;
 
-    console.log(type);
+    console.log(imageUri);
 
     let formData = new FormData();
     formData.append("image", {
-      uri : imageUri,
-      type,
+      image : imageUri,
+      type:mime.getType(imageUri),
       name: imageUri.split("/").pop()
      });
 
@@ -30,17 +31,18 @@ const Confirm = (props) => {
 
     try {
       const response = await axios.post(
-        "http://192.168.137.101:2040/anpr",
+        "http://127.0.0.1:5000/upload",
         formData,
         {
           headers: {
-            "content-type": "multipart/form-data",
+            "content-type": "application/x-www-form-urlencoded",
+            'Accept': 'application/json'
           },
         }
       );
       // const responseJson = await response.json();
       console.log(response);
-      setVehicleId(response["vechileId"]);
+      // setVehicleId(response["vechileId"]);
     } catch (error) {
       console.log(error);
     }
