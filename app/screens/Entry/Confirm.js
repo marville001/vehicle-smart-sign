@@ -1,42 +1,58 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button, Image } from "react-native";
+import { View, Text, StyleSheet, Button, Image, Alert } from "react-native";
 import { colors } from "../../constants/theme";
 import mime from "mime";
+import firebase from "firebase";
+import "firebase/auth";
+import { TextInput } from "react-native-gesture-handler";
 
 const Confirm = (props) => {
   const imageUri = props.route.params.imagePath;
 
   const [vehicleId, setVehicleId] = useState("");
+  const [extractError, setExtractError] = useState("");
+  const [loadingRecords, setLoadingRecords] = useState(true);
+  const [loadError, setLoadError] = useState("");
+  const [records, setRecords] = useState({});
+
+  const loadRecords = async () => {
+    setLoadingRecords(true);
+    try {
+      const db = firebase.database();
+      let ref = db.ref("/Vehicles");
+      
+      ref.on("value", (snapshot) => {
+        console.log(snapshot.val());
+      });
+
+      setLoadingRecords(false);
+    } catch (error) {
+      setLoadError(error.message);
+    }
+  };
 
   async function confirmHandler() {
-    // const { manifest } = Constants;
-    // const apiuri = `http://${manifest.debuggerHost.split(':').shift()}:2040` + '/anpr';
-    // console.log(apiuri)
+    const newImageUri = "file:///" + imageUri.split("file:/").join("");
 
-    // let match = /\.(\w+)$/.exec(imageUri.split("/").pop());
-    // let type = match ? `image/${match[1]}` : `image`;
-
-    let formData = new FormData();
-
+    const formData = new FormData();
     formData.append("image", {
-      image: imageUri,
-      type: mime.getType(imageUri),
-      name: imageUri.split("/").pop(),
+      uri: newImageUri,
+      type: mime.getType(newImageUri),
+      name: newImageUri.split("/").pop(),
     });
 
-    console.log("Extracting... ");
+    const URL = "http://192.168.137.237:5000/upload";
+    try {
+      console.log("Extracting... ");
+      const response = await axios.post(URL, formData);
 
-    fetch("https://smartsign001.herokuapp.com/upload", {
-      method: "POST",
-      headers: {
-        "content-type": "multipart/form-data",
-      },
-      body: formData,
-    })
-      .then((resp) => resp.json())
-      .then((res) => alert(res))
-      .catch(e=>alert(e));
+      setVehicleId(response.data);
+      loadRecords();
+    } catch (e) {
+      setExtractError("Cannot extract");
+      console.log(e);
+    }
   }
 
   function SetResult() {
@@ -48,10 +64,57 @@ const Confirm = (props) => {
         <Text style={styles.generalText}>
           Vehicle registration number is {"\n"}
         </Text>
+
         <Text style={styles.resultText}>{vehicleId}</Text>
+        {loadingRecords && (
+          <Text style={styles.generalText}>Loading record...</Text>
+        )}
+        {!loadingRecords &&
+          (records?.length > 0 ? (
+            <View>
+              <Text>{records.driverName}</Text>
+            </View>
+          ) : (
+            <View>
+              <Text>Vehicle Plate Not Registered</Text>
+            </View>
+          ))}
         <View style={styles.resultButton}>
           <Button
-            title="Return"
+            title="Continue"
+            onPress={() => props.navigation.goBack()}
+            color={colors.accent}
+          />
+        </View>
+      </View>
+    );
+  }
+
+  function SetError() {
+    if (!extractError) {
+      return <View></View>;
+    }
+    return (
+      <View style={[styles.resultView, { justifyContent: "flex-start" }]}>
+        <Text style={styles.genehralText}>
+          Failed to extract, this could be due to network issues {"\n"}
+        </Text>
+
+        <Text style={styles.resultText}>Enter Vehicle Manually</Text>
+        <View>
+          <TextInput
+            style={{
+              borderColor: "#ccc",
+              borderWidth: 1,
+              paddingHorizontal: 10,
+              marginTop: 10,
+            }}
+            placeholder="Enter number plate"
+          />
+        </View>
+        <View style={styles.resultButton}>
+          <Button
+            title="Continue"
             onPress={() => props.navigation.goBack()}
             color={colors.accent}
           />
@@ -72,12 +135,13 @@ const Confirm = (props) => {
           color={colors.accent}
         />
         <Button
-          title="Confirm"
+          title="Extract"
           onPress={confirmHandler}
           color={colors.accent}
         />
       </View>
       <SetResult />
+      <SetError />
     </View>
   );
 };
@@ -87,7 +151,7 @@ const styles = StyleSheet.create({
     flex: 1,
     // justifyContent: "center",
     alignItems: "center",
-    margin: 30,
+    paddingVertical: 30,
   },
   imageView: {
     width: "90%",
@@ -106,7 +170,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   resultView: {
-    height: "30%",
+    minHeight: "30%",
     width: "90%",
     margin: 30,
     alignItems: "center",
@@ -123,7 +187,7 @@ const styles = StyleSheet.create({
     color: "green",
   },
   resultButton: {
-    marginTop: 20,
+    marginVertical: 20,
   },
 });
 
