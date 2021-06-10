@@ -42,7 +42,7 @@ const Confirm = (props) => {
       name: newImageUri.split("/").pop(),
     });
 
-    const URL = "http://192.168.137.237:5000/upload";
+    const URL = "https://smartsign001.herokuapp.com/upload";
     try {
       console.log("Extracting... ");
       const response = await axios.post(URL, formData);
