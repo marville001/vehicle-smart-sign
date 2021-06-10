@@ -6,7 +6,6 @@ import mime from "mime";
 
 const Confirm = (props) => {
   const imageUri = props.route.params.imagePath;
-  console.log("Image: ", imageUri);
 
   const [vehicleId, setVehicleId] = useState("");
 
@@ -18,34 +17,26 @@ const Confirm = (props) => {
     // let match = /\.(\w+)$/.exec(imageUri.split("/").pop());
     // let type = match ? `image/${match[1]}` : `image`;
 
-    console.log(imageUri);
-
     let formData = new FormData();
+
     formData.append("image", {
-      image : imageUri,
-      type:mime.getType(imageUri),
-      name: imageUri.split("/").pop()
-     });
+      image: imageUri,
+      type: mime.getType(imageUri),
+      name: imageUri.split("/").pop(),
+    });
 
     console.log("Extracting... ");
 
-    try {
-      const response = await axios.post(
-        "http://127.0.0.1:5000/upload",
-        formData,
-        {
-          headers: {
-            "content-type": "application/x-www-form-urlencoded",
-            'Accept': 'application/json'
-          },
-        }
-      );
-      // const responseJson = await response.json();
-      console.log(response);
-      // setVehicleId(response["vechileId"]);
-    } catch (error) {
-      console.log(error);
-    }
+    fetch("https://smartsign001.herokuapp.com/upload", {
+      method: "POST",
+      headers: {
+        "content-type": "multipart/form-data",
+      },
+      body: formData,
+    })
+      .then((resp) => resp.json())
+      .then((res) => console.log(res))
+      .catch(e=>console.log(e));
   }
 
   function SetResult() {

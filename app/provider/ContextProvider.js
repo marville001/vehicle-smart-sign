@@ -6,6 +6,7 @@ import "firebase/auth";
 
 const ContextProvider = ({ children }) => {
   const [addLoading, setAddLoading] = useState(false);
+  const [vehicles, setVehicles] = useState();
   const [addError, setAddError] = useState("");
   const [msg, setMsg] = useState("");
 
@@ -15,6 +16,23 @@ const ContextProvider = ({ children }) => {
       callback("");
     }, 2000);
   };
+  useEffect(()=>{
+    const getVehicles = ()=>{
+      const db = firebase.database();
+      let ref = db.ref("/Vehicles");
+      ref.once("value", (snapshot) => {
+        var plates = [];
+
+        snapshot.forEach((snap) => {
+          let data = snap.val();
+
+          plates.push(data.plate);
+        });
+        setVehicles(plates)
+      })
+    }
+    return getVehicles;
+  },[])
 
   const addVehicleSubmit = async (details) => {
     setAddLoading(true);
