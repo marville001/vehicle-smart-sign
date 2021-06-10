@@ -35,8 +35,8 @@ const Confirm = (props) => {
       body: formData,
     })
       .then((resp) => resp.json())
-      .then((res) => console.log(res))
-      .catch(e=>console.log(e));
+      .then((res) => alert(res))
+      .catch(e=>alert(e));
   }
 
   function SetResult() {
