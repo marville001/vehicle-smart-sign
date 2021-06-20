@@ -1,60 +1,89 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
-import { TextInput } from "react-native-gesture-handler";
+import React, { useContext, useState } from "react";
+import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { colors } from "../../constants/theme";
+import MyContext from "../../provider/ContextProvider";
+import { Feather as Icon } from "@expo/vector-icons";
 
-const Card = ({ plate, dname, status, model, make, date }) => {
+const Card = ({ plate, dname, vColor, model, make, date }) => {
+  const signoutVehicle = () => {
+    Alert.alert("Vehicle Sighout", "Do you want to sign out vehicle with id "+plate, [
+      {
+        text: "Cancel",
+        style: "cancel",
+      },
+      { text: "OK", onPress: () => alert("Signed out") },
+    ]);
+  };
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <Text style={{ fontSize: 30 }}>{plate}</Text>
-        <View style={styles.box}></View>
+        <Text style={{ fontSize: 30 }}>Plate: {plate}</Text>
+        <View style={[styles.box, { backgroundColor: vColor }]}></View>
       </View>
       <View style={styles.row}>
-        <Text style={{ fontSize: 20 }}>{dname}</Text>
-        <View>
-          <Text style={{ fontSize: 20, color: colors.accent }}>
-            Status : {status}
-          </Text>
-        </View>
+        <Text style={{ fontSize: 20 }}>Driver: {dname}</Text>
       </View>
       <View style={styles.row}>
         <Text style={{ fontSize: 16, color: "rgba(0,0,0,0.6)" }}>
-          {(model, "", make)}
+          {model + " " + make}
         </Text>
-        <View>
-          <Text style={{ fontSize: 16, color: "rgba(0,0,0,0.6)" }}>
-            Lastly: {date}
-          </Text>
-        </View>
+        <TouchableOpacity onPress={signoutVehicle} style={styles.signOutBtn}>
+          <Text style={{ fontSize: 17, color: colors.primary }}>Sign out</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
 };
 
 const Search = () => {
+  const [search, setSearch] = useState("");
+  const { vehicles, getVehicles } = useContext(MyContext);
+  const filteredVehicles = vehicles.filter((vehicle) =>
+    vehicle.plate.includes(search.toLowerCase())
+  );
   return (
     <View style={styles.container}>
       <View>
-        <TextInput style={styles.input} placeholder="Search" />
+        <TextInput
+          value={search}
+          onChangeText={(text) => setSearch(text)}
+          style={styles.input}
+          placeholder="Search"
+        />
       </View>
-      <View style={styles.cardsContainer}>
-      <Card
-          plate="KCCBBB4"
-          dname="Martin Mwangi"
-          status="OUT"
-          model="Harrier"
-          make="Toyota"
-          date="Today"
-        /><Card
-        plate="KCCBBB4"
-        dname="Martin Mwangi"
-        status="OUT"
-        model="Harrier"
-        make="Toyota"
-        date="Today"
-      />
+      <View
+        style={{ position: "absolute", right: 20 }}
+        onTouchEnd={() => getVehicles()}
+      >
+        <Icon color={colors.accent} name="refresh-cw" size={25} />
       </View>
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        style={styles.cardsContainer}
+      >
+        {filteredVehicles.length > 0 ? (
+          filteredVehicles.map(
+            ({ id, plate, color, driverName, model, make, driverID }) => (
+              <Card
+                key={id}
+                plate={plate}
+                dname={driverName}
+                status="OUT"
+                model={model}
+                make={make}
+                vColor={color}
+              />
+            )
+          )
+        ) : (
+          <Text
+            style={{ fontSize: 30, color: colors.primary, textAlign: "center" }}
+          >
+            No vehicle found
+          </Text>
+        )}
+      </ScrollView>
     </View>
   );
 };
@@ -86,9 +115,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   box: {
-    backgroundColor: "red",
     height: 25,
     width: 30,
+    position: "relative",
+  },
+  signOutBtn: {
+    backgroundColor: colors.accent,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 10,
   },
 });
 

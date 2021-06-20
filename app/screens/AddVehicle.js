@@ -26,8 +26,8 @@ const AddVehicle = ({ navigation }) => {
   const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
 
-  const { addVehicleSubmit, addError, addLoading, setAddError, msg } =
-    useContext(MyContext);
+  const [addLoading, setAddLoading] = useState(false);
+  const [addError, setAddError] = useState("");
 
   const unsetError = () => {
     setTimeout(() => {
@@ -56,6 +56,36 @@ const AddVehicle = ({ navigation }) => {
     } else {
       unsetError();
       setIsValid(true);
+    }
+  };
+
+  const addVehicleSubmit = async (details) => {
+    setAddLoading(true);
+    const plate = details.plate;
+    try {
+      const db = firebase.database();
+      let ref = db.ref("/Vehicles");
+
+      ref.once("value", (snapshot) => {
+        var plates = [];
+
+        snapshot.forEach((snap) => {
+          let data = snap.val();
+
+          plates.push(data.plate);
+        });
+        if (plates.includes(plate)) {
+          update(setAddError, "This number plate is already registered.!");
+        } else {
+          ref.push(details);
+          Alert.alert("Success", "Added successfully"[{ text: "Ok" }]);
+        }
+      });
+
+      setAddLoading(false);
+    } catch (error) {
+      update(setAddError, "Failed add. Try again later");
+      setAddLoading(false);
     }
   };
 
@@ -93,128 +123,74 @@ const AddVehicle = ({ navigation }) => {
   }, [error]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar />
-      <View
+    <View style={styles.container}>
+      <Text
         style={{
-          paddingTop: 30,
-          justifyContent: "center",
-          flex: 1,
+          textAlign: "center",
+          fontSize: 20,
+          color: colors.secondary,
+          marginBottom: 20,
         }}
       >
-        <View>
-          <Text
-            style={{
-              fontSize: 25,
-              color: colors.primary,
-              textAlign: "center",
-            }}
-          >
-            New Vehicle
-          </Text>
+        Add Vehicle
+      </Text>
+      {loading && (
+        <View style={styles.loading}>
+          <Text style={styles.loadingText}>Adding...</Text>
+          <ActivityIndicator color={colors.accent} />
         </View>
-        <View>
-          {addLoading && <ActivityIndicator size={"large"} color="#fff" />}
-          {addError ? (
-            <Text
-              style={{
-                fontSize: 18,
-                textAlign: "center",
-                color: colors.accent,
-              }}
-            >
-              {addError}
-            </Text>
-          ) : null}
-        </View>
-        <View style={styles.form}>
-          <ScrollView
-            style={{ paddingBottom: 150 }}
-            scrollIndicatorInsets={false}
-          >
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Number Plate (7 characters)</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-                onChangeText={(text) => setPlate(text)}
-                value={plate}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Vehicle Model</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-                onChangeText={(text) => setModel(text)}
-                value={model}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Vehicle Make</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-                onChangeText={(text) => setMake(text)}
-                value={make}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Vehicle Color</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-                onChangeText={(text) => setColor(text)}
-                value={color}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Driver Name</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-                onChangeText={(text) => setDriverName(text)}
-                value={driverName}
-              />
-            </View>
-            <View style={styles.inputContainer}>
-              <Text style={styles.label}>Driver ID</Text>
-              <TextInput
-                style={styles.input}
-                placeholder=">"
-                placeholderTextColor={colors.primary}
-                onChangeText={(text) => setDriverID(text)}
-                value={driverID}
-              />
-            </View>
+      )}
 
-            <View
-              style={{
-                marginTop: 20,
-              }}
-            >
-              <TouchableOpacity
-                onPress={handleAddVehicle}
-                style={styles.addBtn}
-                disabled={addLoading ? true : false}
-              >
-                {addLoading ? (
-                  <Text style={{ color: "#fff", fontSize: 20 }}>Adding...</Text>
-                ) : (
-                  <Text style={{ color: "#fff", fontSize: 20 }}>Add</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-            <View style={{ height: 50 }}></View>
-          </ScrollView>
-        </View>
-      </View>
-    </SafeAreaView>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <Form
+          onButtonPress={handleAddVehicle}
+          buttonStyle={styles.buttonStyle}
+          buttonTextStyle={styles.buttonTextStyle}
+        >
+          <FormInputItem
+            place="Enter plate"
+            value={plate}
+            action={setPlate}
+            text="Plate Number"
+          />
+
+          <FormInputItem
+            place="Enter model"
+            value={model}
+            action={setModel}
+            text="Vehicle Model"
+          />
+
+          <FormInputItem
+            place="Enter color"
+            value={color}
+            action={setColor}
+            text="Vehicle Color"
+          />
+
+          <FormInputItem
+            place="Enter make"
+            value={make}
+            action={setMake}
+            text="Vehicle Make"
+          />
+
+          <FormInputItem
+            place="Enter driver name"
+            value={driverName}
+            action={setDriverName}
+            text="Driver Name"
+          />
+
+          <FormInputItem
+            place="Enter driver ID"
+            value={driverID}
+            action={setDriverID}
+            text="Driver ID"
+          />
+        </Form>
+      </ScrollView>
+    </View>
   );
 };
 

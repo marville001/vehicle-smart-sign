@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import {
   View,
   StatusBar,
@@ -9,6 +9,8 @@ import {
 import { colors } from "../../constants/theme";
 import { Feather as Icon } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import MyContext from "../../provider/ContextProvider"
 
 const Home = ({ navigation }) => {
   React.useEffect(() => {
@@ -22,6 +24,7 @@ const Home = ({ navigation }) => {
   };
 
   const renderCard = (title, count, mt) => {
+    
     return (
       <View style={[styles.gridItem, { marginTop: mt }]}>
         <Text
@@ -44,6 +47,8 @@ const Home = ({ navigation }) => {
       </View>
     );
   };
+
+  const {vehicles} = useContext(MyContext);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -103,7 +108,7 @@ const Home = ({ navigation }) => {
         </View>
 
         <View style={[styles.grid, { marginTop: 0 }]}>
-          {renderCard("Total", 100, 0)}
+          {renderCard("Total", vehicles.length, 0)}
           {renderCard("Today's Entry", 80, 0)}
           {renderCard("Today's Exit", 30, 20)}
           {renderCard("Current", 50, 20)}
