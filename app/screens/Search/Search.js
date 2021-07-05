@@ -1,35 +1,51 @@
-import React, { useContext, useState } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
+import React, { useContext, useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  Dimensions,
+} from "react-native";
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
-import { colors } from "../../constants/theme";
-import MyContext from "../../provider/ContextProvider";
+import { useList } from "react-firebase-hooks/database";
 import { Feather as Icon } from "@expo/vector-icons";
+
+import { colors } from "../../constants/theme";
+import { db } from "../../../firebase";
+import Loading from "../../components/Loading";
+
+const screenWidth = Dimensions.get("window").width;
 
 const Card = ({ plate, dname, vColor, model, make, date }) => {
   const signoutVehicle = () => {
-    Alert.alert("Vehicle Sighout", "Do you want to sign out vehicle with id "+plate, [
-      {
-        text: "Cancel",
-        style: "cancel",
-      },
-      { text: "OK", onPress: () => alert("Signed out") },
-    ]);
+    Alert.alert(
+      "Vehicle Sighout",
+      "Do you want to sign out vehicle with id " + plate,
+      [
+        {
+          text: "Cancel",
+          style: "cancel",
+        },
+        { text: "OK", onPress: () => alert("Signed out") },
+      ]
+    );
   };
   return (
     <View style={styles.card}>
       <View style={styles.row}>
-        <Text style={{ fontSize: 30 }}>Plate: {plate}</Text>
+        <Text style={{ fontSize: 20 }}>Plate: {plate}</Text>
         <View style={[styles.box, { backgroundColor: vColor }]}></View>
       </View>
       <View style={styles.row}>
-        <Text style={{ fontSize: 20 }}>Driver: {dname}</Text>
+        <Text style={{ fontSize: 16 }}>Driver: {dname}</Text>
       </View>
       <View style={styles.row}>
-        <Text style={{ fontSize: 16, color: "rgba(0,0,0,0.6)" }}>
+        <Text style={{ fontSize: 14, color: "rgba(0,0,0,.6)" }}>
           {model + " " + make}
         </Text>
         <TouchableOpacity onPress={signoutVehicle} style={styles.signOutBtn}>
-          <Text style={{ fontSize: 17, color: colors.primary }}>Sign out</Text>
+          <Icon color={colors.primary} name="log-out" size={25} />
         </TouchableOpacity>
       </View>
     </View>
@@ -38,25 +54,32 @@ const Card = ({ plate, dname, vColor, model, make, date }) => {
 
 const Search = () => {
   const [search, setSearch] = useState("");
-  const { vehicles, getVehicles } = useContext(MyContext);
-  const filteredVehicles = vehicles.filter((vehicle) =>
-    vehicle.plate.includes(search.toLowerCase())
+  const [snapshots, loading, error] = useList(db.ref("Vehicles"));
+
+  const vehicles = [];
+  snapshots.forEach((v) => {
+    const { plate, color, make, model, driverName, driverID } = v.val();
+    vehicles.push({ plate, color, make, model, driverName, driverID });
+  });
+
+  const filteredVehicles = vehicles.filter((v) =>
+    v.plate.includes(search.toLowerCase())
   );
+
+  if (loading) return <Loading />;
+
   return (
     <View style={styles.container}>
-      <View>
+      <View style={{ flexDirection: "row" }}>
         <TextInput
           value={search}
           onChangeText={(text) => setSearch(text)}
           style={styles.input}
           placeholder="Search"
         />
-      </View>
-      <View
-        style={{ position: "absolute", right: 20 }}
-        onTouchEnd={() => getVehicles()}
-      >
-        <Icon color={colors.accent} name="refresh-cw" size={25} />
+        <View style={styles.filterContainer}>
+          <Icon color={colors.secondaryLight} name="filter" size={25} />
+        </View>
       </View>
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -64,9 +87,9 @@ const Search = () => {
       >
         {filteredVehicles.length > 0 ? (
           filteredVehicles.map(
-            ({ id, plate, color, driverName, model, make, driverID }) => (
+            ({ plate, color, driverName, model, make, driverID }) => (
               <Card
-                key={id}
+                key={plate}
                 plate={plate}
                 dname={driverName}
                 status="OUT"
@@ -96,33 +119,45 @@ const styles = StyleSheet.create({
   },
   input: {
     backgroundColor: "#fff",
-    height: 50,
+    height: 40,
     paddingLeft: 20,
     borderRadius: 10,
-    fontSize: 20,
+    borderBottomRightRadius: 0,
+    borderTopRightRadius: 0,
+    fontSize: 16,
+    width: screenWidth - 110,
+  },
+  filterContainer: {
+    width: 50,
+    backgroundColor: "#fff",
+    borderBottomRightRadius: 10,
+    borderTopRightRadius: 10,
+    alignItems: "center",
+    justifyContent: "center",
   },
   cardsContainer: {
     marginTop: 20,
   },
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: "#eee",
     padding: 20,
     borderRadius: 10,
     marginBottom: 10,
+    height: 110,
   },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
   },
   box: {
-    height: 25,
+    height: 20,
     width: 30,
     position: "relative",
   },
   signOutBtn: {
     backgroundColor: colors.accent,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
+    paddingHorizontal: 5,
+    paddingVertical: 5,
     borderRadius: 10,
   },
 });

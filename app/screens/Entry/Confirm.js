@@ -1,35 +1,56 @@
 import axios from "axios";
 import React, { useState } from "react";
-import { View, Text, StyleSheet, Button, Image, Alert } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  Button,
+  Image,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import { colors } from "../../constants/theme";
 import mime from "mime";
-import firebase from "firebase";
-import "firebase/auth";
 import { TextInput } from "react-native-gesture-handler";
+
+import { useList } from "react-firebase-hooks/database";
+import { db } from "../../../firebase";
 
 const Confirm = (props) => {
   const imageUri = props.route.params.imagePath;
 
   const [vehicleId, setVehicleId] = useState("");
+  const [extractLoading, setExtractLoading] = useState(false);
   const [extractError, setExtractError] = useState("");
-  const [loadingRecords, setLoadingRecords] = useState(true);
-  const [loadError, setLoadError] = useState("");
+  const [loadingRecords, setLoadingRecords] = useState(false);
+  const [recordsError, setRecordsError] = useState("");
   const [records, setRecords] = useState({});
 
+  const [loadingSignIn, setLoadingSignIn] = useState(false);
+
+  const [snapshots, loading, error] = useList(db.ref("Vehicles"));
+
+  const vehicles = [];
+  snapshots.forEach((v) => {
+    const { plate, color, make, model, driverName, driverID } = v.val();
+    vehicles.push({ plate, color, make, model, driverName, driverID });
+  });
+
   const loadRecords = async () => {
+    setRecordsError("");
     setLoadingRecords(true);
     try {
-      const db = firebase.database();
-      let ref = db.ref("/Vehicles");
-      
-      ref.on("value", (snapshot) => {
-        console.log(snapshot.val());
-      });
-
-      setLoadingRecords(false);
+      const vdets = vehicles.filter(
+        (vehicle) => vehicle.plate.toLowerCase() === vehicleId.toLowerCase()
+      );
+      const { plate, color, make, model, driverName, driverID } = vdets[0];
+      setRecords({ plate, color, make, model, driverName, driverID });
     } catch (error) {
-      setLoadError(error.message);
+      setRecordsError("Could not load");
+      Alert.alert("Failed", "Please try again..");
     }
+
+    setLoadingRecords(false);
   };
 
   async function confirmHandler() {
@@ -45,12 +66,15 @@ const Confirm = (props) => {
     const URL = "https://smartsign001.herokuapp.com/upload";
     try {
       console.log("Extracting... ");
+      setExtractLoading(true);
       const response = await axios.post(URL, formData);
 
-      setVehicleId(response.data);
+      setVehicleId(response.data.replace(/\s+/g, ""));
+      setExtractLoading(false);
       loadRecords();
     } catch (e) {
       setExtractError("Cannot extract");
+      setExtractLoading(false);
       console.log(e);
     }
   }
@@ -70,25 +94,98 @@ const Confirm = (props) => {
           <Text style={styles.generalText}>Loading record...</Text>
         )}
         {!loadingRecords &&
-          (records?.length > 0 ? (
+          !recordsError &&
+          (records?.plate ? (
             <View>
-              <Text>{records.driverName}</Text>
+              <View style={{ flexDirection: "row" }}>
+                <Text>Driver name- </Text>
+                <Text
+                  style={{ fontWeight: "bold", textTransform: "capitalize" }}
+                >
+                  {records.driverName}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text>Vehicle Color- </Text>
+                <Text
+                  style={{ fontWeight: "bold", textTransform: "capitalize" }}
+                >
+                  {records.color}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text>Vehicle model- </Text>
+                <Text
+                  style={{ fontWeight: "bold", textTransform: "capitalize" }}
+                >
+                  {records.model}
+                </Text>
+              </View>
+              <View style={{ flexDirection: "row" }}>
+                <Text>Vehicle make- </Text>
+                <Text
+                  style={{ fontWeight: "bold", textTransform: "capitalize" }}
+                >
+                  {records.make}
+                </Text>
+              </View>
+              <View style={styles.resultButton}>
+                <Button
+                  title="Sign In"
+                  onPress={signInVehicle}
+                  color={colors.accent}
+                />
+              </View>
+              {loadingSignIn && (
+                <View style={{ flexDirection: "row" }}>
+                  <Text>loading.... </Text>
+                  <ActivityIndicator color={colors.accent} />
+                </View>
+              )}
             </View>
           ) : (
             <View>
               <Text>Vehicle Plate Not Registered</Text>
+              <Text>Record Length: {records.length}</Text>
+              <View style={styles.resultButton}>
+                <Button
+                  title="Register & Sign In"
+                  onPress={() => {}}
+                  color={colors.accent}
+                />
+              </View>
             </View>
           ))}
-        <View style={styles.resultButton}>
-          <Button
-            title="Continue"
-            onPress={() => props.navigation.goBack()}
-            color={colors.accent}
-          />
-        </View>
       </View>
     );
   }
+
+  const signInVehicle = () => {
+    setLoadingSignIn(true);
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDay();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    try {
+      const { plate, color, make, model, driverName, driverID } = records;
+      db.ref("SignedVehicles").push({
+        plate,
+        color,
+        make,
+        model,
+        driverName,
+        driverID,
+        date: `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`,
+      });
+      Alert.alert("Success", "Signed in successfully");
+    } catch (error) {
+      Alert.alert("Error", error);
+    }
+    setLoadingSignIn(false);
+  };
 
   function SetError() {
     if (!extractError) {
@@ -110,6 +207,7 @@ const Confirm = (props) => {
               marginTop: 10,
             }}
             placeholder="Enter number plate"
+            onChangeText={(text) => setVehicleId(text.toLowerCase())}
           />
         </View>
         <View style={styles.resultButton}>
@@ -134,6 +232,9 @@ const Confirm = (props) => {
           onPress={() => props.navigation.goBack()}
           color={colors.accent}
         />
+
+        {extractLoading && <ActivityIndicator color={colors.accent} />}
+
         <Button
           title="Extract"
           onPress={confirmHandler}

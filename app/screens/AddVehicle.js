@@ -1,20 +1,27 @@
-import { DrawerView } from "@react-navigation/drawer";
-import React, { useContext, useEffect, useState } from "react";
-
-import {
-  View,
-  StyleSheet,
-  Button,
-  Text,
-  TextInput,
-  StatusBar,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
-import { ScrollView, TouchableOpacity } from "react-native-gesture-handler";
-import { SafeAreaView } from "react-native-safe-area-context";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Form, FormItem, Label } from "react-native-form-component";
+import { ActivityIndicator } from "react-native-paper";
 import { colors } from "../constants/theme";
-import MyContext from "../provider/ContextProvider";
+
+import { useList } from "react-firebase-hooks/database";
+import { db } from "../../firebase";
+
+const FormInputItem = ({ text, value, place, action }) => {
+  return (
+    <>
+      <Label style={styles.label} text={text} />
+      <FormItem
+        style={styles.formInput}
+        isRequired
+        value={value}
+        placeholder={place}
+        onChangeText={(plate) => action(plate)}
+      />
+    </>
+  );
+};
 
 const AddVehicle = ({ navigation }) => {
   const [plate, setPlate] = useState("");
@@ -23,19 +30,20 @@ const AddVehicle = ({ navigation }) => {
   const [make, setMake] = useState("");
   const [driverName, setDriverName] = useState("");
   const [driverID, setDriverID] = useState("");
-  const [error, setError] = useState("");
   const [isValid, setIsValid] = useState(false);
 
   const [addLoading, setAddLoading] = useState(false);
-  const [addError, setAddError] = useState("");
 
-  const unsetError = () => {
-    setTimeout(() => {
-      setError("");
-    }, 1000);
-  };
+  const [snapshots, loading, error] = useList(db.ref("Vehicles"));
+
+  const plates = [];
+  snapshots.forEach((snap) => {
+    let data = snap.val();
+    plates.push(data.plate);
+  });
 
   const validateInputs = () => {
+    console.log(plates);
     let isValid = false;
 
     if (
@@ -47,44 +55,33 @@ const AddVehicle = ({ navigation }) => {
       driverID == ""
     ) {
       setIsValid(false);
-      setError("All fields are required!");
-      unsetError();
+      Alert.alert("Input Error", "All fields are required!");
     } else if (plate.length < 7) {
       setIsValid(false);
-      setError("Invalid Number Plate.. should be 7 characters");
-      unsetError();
+      Alert.alert(
+        "Input Error",
+        "Invalid Number Plate.. should be 7 characters"
+      );
     } else {
-      unsetError();
       setIsValid(true);
     }
   };
 
   const addVehicleSubmit = async (details) => {
     setAddLoading(true);
-    const plate = details.plate;
     try {
-      const db = firebase.database();
-      let ref = db.ref("/Vehicles");
 
-      ref.once("value", (snapshot) => {
-        var plates = [];
-
-        snapshot.forEach((snap) => {
-          let data = snap.val();
-
-          plates.push(data.plate);
-        });
-        if (plates.includes(plate)) {
-          update(setAddError, "This number plate is already registered.!");
+        if (plates.includes(details.plate)) {
+          Alert.alert("Record exists", "This number plate is already registered.!");
         } else {
-          ref.push(details);
-          Alert.alert("Success", "Added successfully"[{ text: "Ok" }]);
+          db.ref("Vehicles").push(details);
+          Alert.alert("Success", "Added successfully");
+          resetInputs()
         }
-      });
 
       setAddLoading(false);
     } catch (error) {
-      update(setAddError, "Failed add. Try again later");
+      Alert.alert("Error", "Failed add. Try again later");
       setAddLoading(false);
     }
   };
@@ -93,7 +90,6 @@ const AddVehicle = ({ navigation }) => {
     validateInputs();
 
     if (isValid) {
-      setAddError("");
       addVehicleSubmit({
         plate: plate.toLowerCase(),
         model: model.toLowerCase(),
@@ -102,10 +98,6 @@ const AddVehicle = ({ navigation }) => {
         driverName: driverName.toLowerCase(),
         driverID: driverID.toLowerCase(),
       });
-      if (msg.length > 0) {
-        Alert.alert("Success", msg, [{ text: "Ok", onPress: () => {} }]);
-        resetInputs();
-      }
     }
   };
 
@@ -117,10 +109,6 @@ const AddVehicle = ({ navigation }) => {
     setDriverID("");
     setDriverName("");
   };
-
-  useEffect(() => {
-    if (error) Alert.alert("Error", error, [{ text: "Ok", onPress: () => {} }]);
-  }, [error]);
 
   return (
     <View style={styles.container}>
@@ -134,7 +122,7 @@ const AddVehicle = ({ navigation }) => {
       >
         Add Vehicle
       </Text>
-      {loading && (
+      {addLoading && (
         <View style={styles.loading}>
           <Text style={styles.loadingText}>Adding...</Text>
           <ActivityIndicator color={colors.accent} />
@@ -196,37 +184,35 @@ const AddVehicle = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: colors.secondary,
-  },
-  form: {
-    paddingHorizontal: 30,
-    paddingBottom: 30,
-  },
-  inputContainer: {
-    marginVertical: 5,
-  },
-  input: {
-    borderWidth: 1,
-    height: 40,
-    paddingLeft: 10,
-    borderColor: colors.primary,
-    borderRadius: 5,
-    color: colors.primary,
-    fontSize: 17,
+    paddingHorizontal: 20,
+    paddingVertical: 20,
+    marginBottom: 50,
   },
   label: {
-    fontSize: 17,
-    marginBottom: 5,
-    color: colors.accent,
+    color: colors.secondaryLight,
+    fontSize: 15,
   },
-  addBtn: {
-    backgroundColor: colors.accent,
-    // height:50,
-    paddingVertical: 10,
-    justifyContent: "center",
-    alignItems: "center",
-    borderRadius: 5,
+  formInput: {
+    // backgroundColor:"red",
+    fontSize: 20,
+  },
+  buttonStyle: {
+    backgroundColor: colors.secondaryLight,
+  },
+  buttonTextStyle: {
+    color: colors.primary,
+    fontSize: 20,
+  },
+  loading: {
+    // marginVertical: 10,
+    position: "absolute",
+    right: 20,
+    top: 30,
+    flexDirection: "row",
+  },
+  loadingText: {
+    color: colors.accent,
+    marginRight: 5,
   },
 });
 

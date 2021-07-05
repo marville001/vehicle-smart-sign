@@ -10,7 +10,11 @@ import { colors } from "../../constants/theme";
 import { Feather as Icon } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-import MyContext from "../../provider/ContextProvider"
+import MyContext from "../../provider/ContextProvider";
+
+import { useList } from "react-firebase-hooks/database";
+import { db } from "../../../firebase";
+import Loading from "../../components/Loading";
 
 const Home = ({ navigation }) => {
   React.useEffect(() => {
@@ -19,12 +23,13 @@ const Home = ({ navigation }) => {
     // StatusBar.setHidden(true);
   }, []);
 
+  const [snapshots, loading, error] = useList(db.ref("Vehicles"));
+
   const openMenu = () => {
     navigation.openDrawer();
   };
 
   const renderCard = (title, count, mt) => {
-    
     return (
       <View style={[styles.gridItem, { marginTop: mt }]}>
         <Text
@@ -48,7 +53,9 @@ const Home = ({ navigation }) => {
     );
   };
 
-  const {vehicles} = useContext(MyContext);
+  const { vehicles } = useContext(MyContext);
+
+  if (loading) return <Loading />;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,7 +115,7 @@ const Home = ({ navigation }) => {
         </View>
 
         <View style={[styles.grid, { marginTop: 0 }]}>
-          {renderCard("Total", vehicles.length, 0)}
+          {renderCard("Total", snapshots.length, 0)}
           {renderCard("Today's Entry", 80, 0)}
           {renderCard("Today's Exit", 30, 20)}
           {renderCard("Current", 50, 20)}
@@ -118,19 +125,23 @@ const Home = ({ navigation }) => {
       <View
         style={{
           marginTop: 40,
-          alignItems:"center",
-          borderBottomWidth:2,
-          borderBottomColor:  colors.secondaryLight,
-          marginHorizontal:30,
-          paddingBottom:10,
-          marginBottom:10
+          alignItems: "center",
+          borderBottomWidth: 2,
+          borderBottomColor: colors.secondaryLight,
+          marginHorizontal: 30,
+          paddingBottom: 10,
+          marginBottom: 10,
         }}
       >
-        <Text style={{
-          fontSize:20,
-          color:colors.primary,
-          textTransform:"uppercase"
-        }}>Record Entry or Exit</Text>
+        <Text
+          style={{
+            fontSize: 20,
+            color: colors.primary,
+            textTransform: "uppercase",
+          }}
+        >
+          Record Entry or Exit
+        </Text>
       </View>
 
       <View style={styles.buttons}>
@@ -169,19 +180,19 @@ const styles = StyleSheet.create({
   },
   buttons: {
     paddingHorizontal: 30,
-    flexDirection:"row"
+    flexDirection: "row",
   },
   entryButton: {
     backgroundColor: colors.accent,
     paddingVertical: 20,
     alignItems: "center",
-    flex:1,
+    flex: 1,
     borderRadius: 10,
     marginRight: 10,
   },
   exitButton: {
     backgroundColor: colors.secondaryLight,
-    marginRight:0
+    marginRight: 0,
   },
   buttonText: {
     fontSize: 16,
