@@ -18,6 +18,7 @@ import { db } from "../../../firebase";
 
 const Confirm = (props) => {
   const imageUri = props.route.params.imagePath;
+  const { navigation } = props;
 
   const [vehicleId, setVehicleId] = useState("");
   const [extractLoading, setExtractLoading] = useState(false);
@@ -43,10 +44,13 @@ const Confirm = (props) => {
       const vdets = vehicles.filter(
         (vehicle) => vehicle.plate.toLowerCase() === vehicleId.toLowerCase()
       );
-      const { plate, color, make, model, driverName, driverID } = vdets[0];
-      setRecords({ plate, color, make, model, driverName, driverID });
+      if (vdets.length > 0) {
+        const { plate, color, make, model, driverName, driverID } = vdets[0];
+        setRecords({ plate, color, make, model, driverName, driverID });
+      }
     } catch (error) {
       setRecordsError("Could not load");
+      console.log(error);
       Alert.alert("Failed", "Please try again..");
     }
 
@@ -95,7 +99,7 @@ const Confirm = (props) => {
         )}
         {!loadingRecords &&
           !recordsError &&
-          (records?.plate ? (
+          (records.plate != undefined ? (
             <View>
               <View style={{ flexDirection: "row" }}>
                 <Text>Driver name- </Text>
@@ -146,11 +150,15 @@ const Confirm = (props) => {
           ) : (
             <View>
               <Text>Vehicle Plate Not Registered</Text>
-              <Text>Record Length: {records.length}</Text>
               <View style={styles.resultButton}>
                 <Button
                   title="Register & Sign In"
-                  onPress={() => {}}
+                  onPress={() => {
+                    navigation.navigate("Add Vehicle", {
+                      screen: "AddVehicle",
+                      params: { vplate: vehicleId },
+                    });
+                  }}
                   color={colors.accent}
                 />
               </View>
@@ -181,6 +189,7 @@ const Confirm = (props) => {
         date: `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`,
       });
       Alert.alert("Success", "Signed in successfully");
+      navigation.navigate("EntryHome");
     } catch (error) {
       Alert.alert("Error", error);
     }

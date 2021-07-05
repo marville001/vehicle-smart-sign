@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   View,
   StatusBar,
@@ -23,7 +23,17 @@ const Home = ({ navigation }) => {
     // StatusBar.setHidden(true);
   }, []);
 
-  const [snapshots, loading, error] = useList(db.ref("Vehicles"));
+  const [signed, setSigned] = useState([]);
+
+  let [snapshots, loading, error] = useList(db.ref("Vehicles"));
+
+  useEffect(() => {
+    db.ref("/SignedVehicles").on("value", (querySnapShot) => {
+      let data = querySnapShot.val() ? querySnapShot.val() : {};
+      let items = { ...data };
+      setSigned(Object.values(items));
+    });
+  }, []);
 
   const openMenu = () => {
     navigation.openDrawer();
@@ -116,7 +126,7 @@ const Home = ({ navigation }) => {
 
         <View style={[styles.grid, { marginTop: 0 }]}>
           {renderCard("Total", snapshots.length, 0)}
-          {renderCard("Today's Entry", 80, 0)}
+          {renderCard("Today's Entry", signed.length, 0)}
           {renderCard("Today's Exit", 30, 20)}
           {renderCard("Current", 50, 20)}
         </View>

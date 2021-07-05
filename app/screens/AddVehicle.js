@@ -23,7 +23,9 @@ const FormInputItem = ({ text, value, place, action }) => {
   );
 };
 
-const AddVehicle = ({ navigation }) => {
+const AddVehicle = ({ route, navigation }) => {
+  const { vplate } = route.params;
+
   const [plate, setPlate] = useState("");
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
@@ -33,8 +35,14 @@ const AddVehicle = ({ navigation }) => {
   const [isValid, setIsValid] = useState(false);
 
   const [addLoading, setAddLoading] = useState(false);
+  const [loadingSignIn, setLoadingSignIn] = useState(false);
 
   const [snapshots, loading, error] = useList(db.ref("Vehicles"));
+  useEffect(() => {
+    if (vplate.length != 0) {
+      setPlate(vplate);
+    }
+  }, []);
 
   const plates = [];
   snapshots.forEach((snap) => {
@@ -70,20 +78,52 @@ const AddVehicle = ({ navigation }) => {
   const addVehicleSubmit = async (details) => {
     setAddLoading(true);
     try {
-
-        if (plates.includes(details.plate)) {
-          Alert.alert("Record exists", "This number plate is already registered.!");
-        } else {
-          db.ref("Vehicles").push(details);
-          Alert.alert("Success", "Added successfully");
-          resetInputs()
+      if (plates.includes(details.plate)) {
+        Alert.alert(
+          "Record exists",
+          "This number plate is already registered.!"
+        );
+      } else {
+        db.ref("Vehicles").push(details);
+        Alert.alert("Success", "Added successfully");
+        if (vplate.length != 0) {
+          signInVehicle()
         }
+        resetInputs();
+      }
 
       setAddLoading(false);
     } catch (error) {
       Alert.alert("Error", "Failed add. Try again later");
       setAddLoading(false);
     }
+  };
+
+  const signInVehicle = () => {
+    setLoadingSignIn(true);
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDay();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+
+    try {
+      db.ref("SignedVehicles").push({
+        plate,
+        color,
+        make,
+        model,
+        driverName,
+        driverID,
+        date: `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`,
+      });
+      Alert.alert("Success", "Signed in successfully");
+    } catch (error) {
+      Alert.alert("Error", error);
+    }
+    setLoadingSignIn(false);
   };
 
   const handleAddVehicle = () => {
@@ -125,6 +165,13 @@ const AddVehicle = ({ navigation }) => {
       {addLoading && (
         <View style={styles.loading}>
           <Text style={styles.loadingText}>Adding...</Text>
+          <ActivityIndicator color={colors.accent} />
+        </View>
+      )}
+
+      {loadingSignIn && (
+        <View style={styles.loading}>
+          <Text style={styles.loadingText}>Signin vehicle...</Text>
           <ActivityIndicator color={colors.accent} />
         </View>
       )}
