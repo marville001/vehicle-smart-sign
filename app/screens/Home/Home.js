@@ -80,7 +80,7 @@ const Home = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            Monday Mar,19
+            Tuesday July,6
           </Text>
           <View
             style={{

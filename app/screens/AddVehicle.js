@@ -24,7 +24,7 @@ const FormInputItem = ({ text, value, place, action }) => {
 };
 
 const AddVehicle = ({ route, navigation }) => {
-  const { vplate } = route.params;
+  // const { vplate } = route.params;
 
   const [plate, setPlate] = useState("");
   const [model, setModel] = useState("");
@@ -38,11 +38,11 @@ const AddVehicle = ({ route, navigation }) => {
   const [loadingSignIn, setLoadingSignIn] = useState(false);
 
   const [snapshots, loading, error] = useList(db.ref("Vehicles"));
-  useEffect(() => {
-    if (vplate.length != 0) {
-      setPlate(vplate);
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (vplate.length != 0) {
+  //     setPlate(vplate);
+  //   }
+  // }, []);
 
   const plates = [];
   snapshots.forEach((snap) => {
@@ -86,9 +86,6 @@ const AddVehicle = ({ route, navigation }) => {
       } else {
         db.ref("Vehicles").push(details);
         Alert.alert("Success", "Added successfully");
-        if (vplate.length != 0) {
-          signInVehicle()
-        }
         resetInputs();
       }
 

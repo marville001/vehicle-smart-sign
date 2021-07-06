@@ -21,6 +21,7 @@ const Confirm = (props) => {
   const { navigation } = props;
 
   const [vehicleId, setVehicleId] = useState("");
+  const [plate, setPlate] = useState("");
   const [extractLoading, setExtractLoading] = useState(false);
   const [extractError, setExtractError] = useState("");
   const [loadingRecords, setLoadingRecords] = useState(false);
@@ -57,22 +58,49 @@ const Confirm = (props) => {
     setLoadingRecords(false);
   };
 
+  const loadRecordss = async () => {
+    setRecordsError("");
+    setLoadingRecords(true);
+    try {
+      const vdets = vehicles.filter(
+        (vehicle) => vehicle.plate.toLowerCase() === plate.toLowerCase()
+      );
+      if (vdets.length > 0) {
+        const { plate, color, make, model, driverName, driverID } = vdets[0];
+        setRecords({ plate, color, make, model, driverName, driverID });
+      }
+    } catch (error) {
+      setRecordsError("Could not load");
+      console.log(error);
+      Alert.alert("Failed", "Please try again..");
+    }
+
+    setLoadingRecords(false);
+  };
+
   async function confirmHandler() {
-    const newImageUri = "file:///" + imageUri.split("file:/").join("");
+    
 
-    const formData = new FormData();
-    formData.append("image", {
-      uri: newImageUri,
-      type: mime.getType(newImageUri),
-      name: newImageUri.split("/").pop(),
-    });
-
+    // const URL = "http://192.168.43.98:5000/upload";
     const URL = "https://smartsign001.herokuapp.com/upload";
     try {
+      const newImageUri = "file://" + imageUri.split("file:/").join("");
+
+      const formData = new FormData();
+      formData.append("image", {
+        uri: imageUri,
+        type: mime.getType(newImageUri),
+        name: newImageUri.split("/").pop(),
+      });
+
+      console.log("FormdDtate",{formData});
+
       console.log("Extracting... ");
       setExtractLoading(true);
+      
       const response = await axios.post(URL, formData);
-
+      
+      
       setVehicleId(response.data.replace(/\s+/g, ""));
       setExtractLoading(false);
       loadRecords();
@@ -215,14 +243,15 @@ const Confirm = (props) => {
               paddingHorizontal: 10,
               marginTop: 10,
             }}
+            value={plate}
             placeholder="Enter number plate"
-            onChangeText={(text) => setVehicleId(text.toLowerCase())}
+            onChangeText={(text) => setPlate(text.toLowerCase())}
           />
         </View>
         <View style={styles.resultButton}>
           <Button
             title="Continue"
-            onPress={() => props.navigation.goBack()}
+            onPress={loadRecordss}
             color={colors.accent}
           />
         </View>
