@@ -1,79 +1,77 @@
 import React, { useEffect, useState } from "react";
 import { View, Button, StyleSheet, Alert } from "react-native";
+
 import * as ImagePicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
+import { Provider } from "react-native-paper";
+
 import { colors } from "../constants/theme";
-import { Camera } from "expo-camera";
+import ImageExtractModal from "./ImageExtractModal";
 
 const ImageSelector = (props) => {
-  const [status, setStatus] = useState("");
+  const [image, setImage] = useState(null);
+  const [visible, setVisible] = React.useState(false);
+  const showModal = () => setVisible(true);
+  const hideModal = () => setVisible(false);
 
   useEffect(() => {
     (async () => {
-      const { status } = await Camera.requestPermissionsAsync();
-      setStatus(status === "granted"?"granted":"not");
-    })();
-  }, [status]);
-
-  const buttonPressHandler = async (buttonType) => {
-    let selectedImage;
-
-    const imageProperties = {
-      allowsEditing: true,
-      aspect: [4, 3],
-    };
-
-    if (buttonType === "camera") {
-      if (status !== "granted") {
-        Alert.alert(
-          "Insufficient privilege",
-          "Permission required to access camera",
-          [{ text: "Ok" }]
-        );
-        return;
-      } else {
-        selectedImage = await ImagePicker.launchCameraAsync(imageProperties);
-      }
-    } else {
-      const resultMedia =
+      const { status } =
         await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (!resultMedia) {
-        Alert.alert(
-          "Insufficient privilege",
-          "Permission required to photo roll",
-          [{ text: "Ok" }]
-        );
-        return;
-      } else {
-        selectedImage = await ImagePicker.launchImageLibraryAsync(
-          imageProperties
-        );
+      if (status !== "granted") {
+        Alert.alert("Sorry, grant permissions to capture image");
       }
-    }
+    })();
+  }, []);
 
-    if (selectedImage.cancelled) {
-      return;
+  const pickImageFromCamera = async () => {
+    let result = await ImagePicker.launchCameraAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 2],
+      quality: 1,
+    });
+
+    console.log(result);
+    if (!result.cancelled) {
+      setImage(result.uri);
+      showModal()
     }
-    props.onSelect(selectedImage.uri);
+  };
+
+  const pickImageFromGallery = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 2],
+      quality: 1,
+    });
+    if (!result.cancelled) {
+      setImage(result.uri);
+      showModal()
+    }
   };
 
   return (
-    <View>
-      <View style={styles.buttonView}>
-        <Button
-          title="Take Picture"
-          onPress={() => buttonPressHandler("camera")}
-          color={colors.accent}
-        />
+    <Provider>
+      <ImageExtractModal image={image} visible={visible} hideModal={hideModal} />
+
+      <View>
+        <View style={styles.buttonView}>
+          <Button
+            title="Take Picture"
+            onPress={() => pickImageFromCamera()}
+            color={colors.accent}
+          />
+        </View>
+        <View style={styles.buttonView}>
+          <Button
+            title="Select Picture"
+            onPress={() => pickImageFromGallery()}
+            color={colors.secondary}
+          />
+        </View>
       </View>
-      <View style={styles.buttonView}>
-        <Button
-          title="Select Picture"
-          onPress={() => buttonPressHandler("camera_roll")}
-          color={colors.secondary}
-        />
-      </View>
-    </View>
+    </Provider>
   );
 };
 
