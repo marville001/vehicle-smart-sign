@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import {
   Modal,
   Portal,
-  IconButton,
   ActivityIndicator,
   Colors,
   Button,
@@ -24,7 +23,7 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
 
     const formData = new FormData();
     formData.append('image', {
-      uri : newImageUri.replace('file://', 'file:///'),
+      uri : image,
       mineType: 'image/jpeg',
       fileType: 'image/jpg',
       type: mime.getType(newImageUri),
@@ -32,14 +31,20 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
       name: newImageUri.split("/").pop()
     });
 
-    console.log("formdata",formData);
-    console.log("newImageUri",newImageUri);
+    // console.log("formdata",formData);
+    // console.log("newImageUri",newImageUri);
 
     try {
 
       setLoading(true)
-      const response = await axios .post("http://172.16.65.119:5000/upload", {data: formData});
-
+      // const response = await axios.post("http://192.168.100.60:5000/upload", formData,{
+      //   headers: {
+      //     Accept: 'application/json',
+      //     'Content-Type': 'multipart/form-data',
+      //   },
+      // });
+      const response = await axios.post("https://smartsign001.herokuapp.com/upload", {data: formData});
+      
       console.log(response);
       setLoading(false)
     } catch (error) {
