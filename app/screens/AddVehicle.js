@@ -2,7 +2,7 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { Alert, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Form, FormItem, Label } from "react-native-form-component";
-import { ActivityIndicator } from "react-native-paper";
+import { ActivityIndicator, RadioButton } from "react-native-paper";
 import { colors } from "../constants/theme";
 
 import { useList } from "react-firebase-hooks/database";
@@ -33,6 +33,8 @@ const AddVehicle = ({ route, navigation }) => {
   const [driverName, setDriverName] = useState("");
   const [driverID, setDriverID] = useState("");
   const [isValid, setIsValid] = useState(false);
+  const [value, setValue] = React.useState('visitor');
+
 
   const [addLoading, setAddLoading] = useState(false);
   const [loadingSignIn, setLoadingSignIn] = useState(false);
@@ -179,6 +181,49 @@ const AddVehicle = ({ route, navigation }) => {
           buttonStyle={styles.buttonStyle}
           buttonTextStyle={styles.buttonTextStyle}
         >
+          <View style={styles.detHead}>
+            <Text style={styles.det}>Driver Details</Text>
+          </View>
+          <RadioButton.Group 
+            onValueChange={newValue => setValue(newValue)} 
+            value={value}
+          >
+            <View style={styles.radioGroup}>
+                <View style={styles.radio}>
+                  <RadioButton value="visitor" />
+                  <Text>Visitor</Text>
+                </View>
+                <View style={[styles.radio,{marginLeft: 20}]}>
+                  <RadioButton value="staff" />
+                  <Text>Staff</Text>
+                </View>
+            </View>
+          </RadioButton.Group>
+          <FormInputItem
+            place="Enter driver name"
+            value={driverName}
+            action={setDriverName}
+            text="Driver Name"
+          />
+
+          <FormInputItem
+            place="Enter driver ID"
+            value={driverID}
+            action={setDriverID}
+            text="Driver ID"
+          />
+
+          {value === "visitor" && <FormInputItem
+            place="Enter purpose"
+            value={driverID}
+            action={setDriverID}
+            text="Purpose of visit"
+          />}
+
+          <View style={styles.detHead}>
+            <Text style={styles.det}>Vehicle Details</Text>
+          </View>
+
           <FormInputItem
             place="Enter plate"
             value={plate}
@@ -199,26 +244,13 @@ const AddVehicle = ({ route, navigation }) => {
             action={setColor}
             text="Vehicle Color"
           />
+          
 
           <FormInputItem
             place="Enter make"
             value={make}
             action={setMake}
             text="Vehicle Make"
-          />
-
-          <FormInputItem
-            place="Enter driver name"
-            value={driverName}
-            action={setDriverName}
-            text="Driver Name"
-          />
-
-          <FormInputItem
-            place="Enter driver ID"
-            value={driverID}
-            action={setDriverID}
-            text="Driver ID"
           />
         </Form>
       </ScrollView>
@@ -258,6 +290,21 @@ const styles = StyleSheet.create({
     color: colors.accent,
     marginRight: 5,
   },
+  radioGroup: {
+    flexDirection: "row",
+    alignItems:"center",
+    marginBottom:20
+  },
+  radio: {
+    flexDirection: "row",
+    alignItems:"center",
+  },
+  detHead: {
+    marginVertical: 10
+  }, det: {
+    fontSize: 20,
+    fontWeight: "600"
+  }
 });
 
 export default AddVehicle;
