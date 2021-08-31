@@ -32,7 +32,7 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
     });
     try {
       setLoading(true)
-      const response = await axios.post("http://192.168.0.113:5050/upload", formData, {
+      const response = await axios.post("https://smartsign001.herokuapp.com/upload", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
