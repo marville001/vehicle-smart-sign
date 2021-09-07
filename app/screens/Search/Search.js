@@ -69,7 +69,7 @@ const Search = () => {
 
   const vehicles = [];
   snapshots.forEach((v) => {
-    const { plate, color, make, model, driverName, driverID,type } = v.val();
+    const { plate, color, make, model, driverName, driverID, type } = v.val();
     vehicles.push({ plate, color, make, model, driverName, driverID, type });
   });
 
@@ -79,8 +79,8 @@ const Search = () => {
 
   if (loading) return <Loading />;
 
-  const rowClick =  (plate) => {
-    const vd = vehicles.filter(v=>v.plate===plate)[0];
+  const rowClick = (plate) => {
+    const vd = vehicles.filter(v => v.plate === plate)[0];
     console.log(vd);
     setSelected(vd)
     showModal();
@@ -104,7 +104,7 @@ const Search = () => {
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={{marginVertical:20}}
+          style={{ marginVertical: 20 }}
         >
           {filteredVehicles.length > 0 ? (
             <View style={styles.tableContainer}>

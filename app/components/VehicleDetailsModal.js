@@ -1,12 +1,17 @@
 import { MaterialIcons } from '@expo/vector-icons'
 import React from 'react'
-import { Dimensions, StyleSheet, Text, View } from 'react-native'
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Modal, Portal } from 'react-native-paper'
 import { colors } from '../constants/theme';
 
 const deviceHeight = Dimensions.get("window").height;
 
 const VehicleDetailsModal = ({ visible, hideModal, selected }) => {
+
+    const handleSignout = () => {
+        alert('signing out ...')
+    }
+
     return (
         <Portal>
             <Modal
@@ -20,6 +25,7 @@ const VehicleDetailsModal = ({ visible, hideModal, selected }) => {
                     size={24}
                     color="black"
                 />
+
                 <View style={[styles.detCont, { marginTop: 15 }]}>
                     <Text style={styles.det}>Plate</Text>
                     <Text style={styles.det2}>{selected.plate}</Text>
@@ -48,6 +54,13 @@ const VehicleDetailsModal = ({ visible, hideModal, selected }) => {
                     <Text style={styles.det}>Type</Text>
                     <Text style={styles.det2}>{selected.type}</Text>
                 </View>
+
+                <TouchableOpacity
+                    onPress={handleSignout}
+                    style={styles.loginBtn}
+                >
+                    <Text style={styles.loginText}>Sign Out Vehicle</Text>
+                </TouchableOpacity>
             </Modal>
         </Portal>
     )
@@ -65,17 +78,32 @@ const styles = StyleSheet.create({
     },
     detCont: {
         flexDirection: "row",
-        marginVertical: 5
+        marginVertical: 5,
     },
     det: {
         marginRight: 20,
         fontSize: 18
-    }, 
+    },
     det2: {
         fontSize: 18,
         color: colors.secondary,
-        fontWeight: "bold"
-    }
+        fontWeight: "bold",
+        justifyContent: "flex-end"
+    },
+    loginBtn: {
+        backgroundColor: colors.accent,
+        width: "80%",
+        borderRadius: 15,
+        height: 50,
+        alignItems: "center",
+        justifyContent: "center",
+        marginTop: 40,
+        marginBottom: 10,
+    },
+    loginText: {
+        color: "white",
+        fontSize: 20
+    },
 });
 
 export default VehicleDetailsModal
