@@ -69,8 +69,8 @@ const Search = () => {
 
   const vehicles = [];
   snapshots.forEach((v) => {
-    const { plate, color, make, model, driverName, driverID } = v.val();
-    vehicles.push({ plate, color, make, model, driverName, driverID });
+    const { plate, color, make, model, driverName, driverID,type } = v.val();
+    vehicles.push({ plate, color, make, model, driverName, driverID, type });
   });
 
   const filteredVehicles = vehicles.filter((v) =>
@@ -104,27 +104,24 @@ const Search = () => {
         </View>
         <ScrollView
           showsVerticalScrollIndicator={false}
-          style={styles.cardsContainer}
+          style={{marginVertical:20}}
         >
           {filteredVehicles.length > 0 ? (
             <View style={styles.tableContainer}>
               <DataTable style={styles.table}>
                 <DataTable.Header style={styles.tableHeader}>
                   <DataTable.Title ><Text style={styles.tableHeaderTitle}>Plate</Text></DataTable.Title>
-                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>D. ID</Text></DataTable.Title>
                   <DataTable.Title ><Text style={styles.tableHeaderTitle}>D. Name</Text></DataTable.Title>
-                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>Action</Text></DataTable.Title>
+                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>D. ID</Text></DataTable.Title>
+                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>Type</Text></DataTable.Title>
                 </DataTable.Header>
-                {filteredVehicles.map(({ plate, color, driverName, model, make, driverID }) => (
+                {filteredVehicles.map(({ plate, color, driverName, model, make, driverID, type }) => (
                   <DataTable.Row style={styles.tableRow} onPress={() => rowClick(plate)}>
                     <DataTable.Cell><Text style={styles.tableRowContent}>{plate}</Text></DataTable.Cell>
-                    <DataTable.Cell ><Text style={styles.tableRowContent}>Name</Text></DataTable.Cell>
-                    <DataTable.Cell ><Text style={styles.tableRowContent}>Name</Text></DataTable.Cell>
-                    <DataTable.Cell >
-
-                    </DataTable.Cell>
+                    <DataTable.Cell ><Text style={styles.tableRowContent}>{driverName}</Text></DataTable.Cell>
+                    <DataTable.Cell ><Text style={styles.tableRowContent}>{driverID}</Text></DataTable.Cell>
+                    <DataTable.Cell ><Text style={styles.tableRowContent}>{type}</Text></DataTable.Cell>
                   </DataTable.Row>
-
                 )
                 )
                 }
@@ -184,7 +181,7 @@ const styles = StyleSheet.create({
   tableRowContent: {
     fontSize: 13,
     color: "#fff",
-    textAlign: "center"
+    textAlign: "center",
   }
 });
 
