@@ -18,10 +18,11 @@ const deviceHeight = Dimensions.get("window").height;
 
 const ImageExtractModal = ({ image, visible, hideModal }) => {
   const [loading, setLoading] = useState(false);
+  const [userLoading, setUserLoading] = useState(false);
   const [plate, setPlate] = useState("");
 
   const handleExtract = async () => {
-
+    setPlate("");
     const newImageUri = "file:///" + image.split("file:/").join("");
 
     const formData = new FormData();
@@ -32,13 +33,12 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
     });
     try {
       setLoading(true)
+
       const response = await axios.post("https://smartsign001.herokuapp.com/upload", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-
-      // console.log(response.data);
       console.log(response.data.replace(/\s+/g, ""))
       setPlate(response.data.replace(/\s+/g, ""))
       setLoading(false)
@@ -46,8 +46,11 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
       setLoading(false)
       console.log(error);
     }
-
   };
+
+  const loadDriver = async(id) =>{
+      
+  }
 
   return (
     <Portal>
@@ -57,7 +60,7 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
         contentContainerStyle={styles.modal}
       >
         <MaterialIcons
-          onPress={()=>{
+          onPress={() => {
             setPlate("")
             hideModal()
           }}
@@ -89,29 +92,48 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
           </>
         )}
         {plate !== "" && (
-        <View>
-          <View style={styles.pExtractedContainer}>
-            <Text style={{color:"#fff"}}>Plate Extracted </Text><Text style={styles.plateText}>{plate}</Text>
-          </View>
-
           <View>
-            <Text style={{color:"#000000", fontWeight:"900",fontSize:16, borderBottomColor:"#eee", borderBottomWidth:2}}>User Details</Text>
-            <Text style={{color:"#000000", fontWeight:"900",fontSize:14}}>Name : </Text>
-            <Text style={{color:"#000000", fontWeight:"900",fontSize:14}}>ID : </Text>
-            <Text style={{color:"#000000", fontWeight:"900",fontSize:14}}>Type : </Text>
-            <ActivityIndicator
+            <View style={styles.pExtractedContainer}>
+              <Text style={{ color: "#fff" }}>Plate Extracted </Text><Text style={styles.plateText}>{plate}</Text>
+            </View>
+
+            <View>
+              <Text style={{
+                color: "#000000",
+                fontWeight: "900",
+                fontSize: 16,
+                borderBottomColor: "#eee",
+                borderBottomWidth: 2
+              }}>Driver Details</Text>
+              {userLoading ?
+                <ActivityIndicator
                   // style={styles.loading}
                   size="small"
                   animating={true}
-                  color={Colors.red800}
-            />
+                  color={Colors.red800} /> :
+                <>
 
-            <TouchableOpacity style={{backgroundColor:colors.accent, alignItems:"center", paddingVertical:8, borderRadius:10}}>
-              <Text>Sign In </Text>
-            </TouchableOpacity>
-
+                  <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>Name :
+                    <Text style={styles.detText}> Martin Mwangi</Text>
+                  </Text>
+                  <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>ID :
+                    <Text style={styles.detText}> 354266288</Text>
+                  </Text>
+                  <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>Type :
+                    <Text style={styles.detText}> Staff</Text>
+                  </Text>
+                  <TouchableOpacity style={{ 
+                    backgroundColor: colors.accent, 
+                    alignItems: "center", 
+                    paddingVertical: 8, 
+                    borderRadius: 10,
+                    marginTop: 10
+                     }}>
+                    <Text>Sign In </Text>
+                  </TouchableOpacity>
+                </>}
+            </View>
           </View>
-        </View>
         )}
       </Modal>
     </Portal>
@@ -145,18 +167,23 @@ const styles = StyleSheet.create({
   loading: {
     position: "absolute",
   },
-  pExtractedContainer:{
+  pExtractedContainer: {
     backgroundColor: colors.secondaryLight,
-    marginVertical:20,
-    paddingVertical:10,
-    paddingHorizontal:30,
-    borderRadius:10,
+    marginVertical: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 30,
+    borderRadius: 10,
     flexDirection: "row"
   },
-  plateText:{
-    color:colors.accent,
-    fontWeight:"bold",
-    fontSize:16
+  plateText: {
+    color: colors.accent,
+    fontWeight: "bold",
+    fontSize: 16
+  },
+  detText: {
+    paddingLeft: 20,
+    color: colors.accent,
+    fontSize: 15
   }
 });
 
