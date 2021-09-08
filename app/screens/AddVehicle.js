@@ -33,18 +33,14 @@ const AddVehicle = ({ route, navigation }) => {
   const [driverName, setDriverName] = useState("");
   const [driverID, setDriverID] = useState("");
   const [isValid, setIsValid] = useState(false);
-  const [value, setValue] = React.useState('visitor');
+  const [type, setType] = useState('visitor');
+  const [purpose, setPurpose] = useState("");
 
 
   const [addLoading, setAddLoading] = useState(false);
   const [loadingSignIn, setLoadingSignIn] = useState(false);
 
   const [snapshots, loading, error] = useList(db.ref("Vehicles"));
-  // useEffect(() => {
-  //   if (vplate.length != 0) {
-  //     setPlate(vplate);
-  //   }
-  // }, []);
 
   const plates = [];
   snapshots.forEach((snap) => {
@@ -62,7 +58,8 @@ const AddVehicle = ({ route, navigation }) => {
       color == "" ||
       make == "" ||
       driverName == "" ||
-      driverID == ""
+      driverID == "" ||
+      type === "visitor" && purpose == ""
     ) {
       setIsValid(false);
       Alert.alert("Input Error", "All fields are required!");
@@ -129,14 +126,20 @@ const AddVehicle = ({ route, navigation }) => {
     validateInputs();
 
     if (isValid) {
-      addVehicleSubmit({
+      const details = {
         plate: plate.toLowerCase(),
         model: model.toLowerCase(),
         make: make.toLowerCase(),
         color: color.toLowerCase(),
         driverName: driverName.toLowerCase(),
         driverID: driverID.toLowerCase(),
-      });
+        type: type.toLowerCase()
+      }
+      if (type === "visitor") {
+        details.purpose = purpose
+      }
+
+      addVehicleSubmit(details);
     }
   };
 
@@ -184,19 +187,19 @@ const AddVehicle = ({ route, navigation }) => {
           <View style={styles.detHead}>
             <Text style={styles.det}>Driver Details</Text>
           </View>
-          <RadioButton.Group 
-            onValueChange={newValue => setValue(newValue)} 
-            value={value}
+          <RadioButton.Group
+            onValueChange={newValue => setType(newValue)}
+            value={type}
           >
             <View style={styles.radioGroup}>
-                <View style={styles.radio}>
-                  <RadioButton value="visitor" />
-                  <Text>Visitor</Text>
-                </View>
-                <View style={[styles.radio,{marginLeft: 20}]}>
-                  <RadioButton value="staff" />
-                  <Text>Staff</Text>
-                </View>
+              <View style={styles.radio}>
+                <RadioButton value="visitor" />
+                <Text>Visitor</Text>
+              </View>
+              <View style={[styles.radio, { marginLeft: 20 }]}>
+                <RadioButton value="staff" />
+                <Text>Staff</Text>
+              </View>
             </View>
           </RadioButton.Group>
           <FormInputItem
@@ -213,12 +216,13 @@ const AddVehicle = ({ route, navigation }) => {
             text="Driver ID"
           />
 
-          {value === "visitor" && <FormInputItem
+          {type === "visitor" && <FormInputItem
             place="Enter purpose"
-            value={driverID}
-            action={setDriverID}
+            value={purpose}
+            action={setPurpose}
             text="Purpose of visit"
           />}
+
 
           <View style={styles.detHead}>
             <Text style={styles.det}>Vehicle Details</Text>
@@ -244,7 +248,7 @@ const AddVehicle = ({ route, navigation }) => {
             action={setColor}
             text="Vehicle Color"
           />
-          
+
 
           <FormInputItem
             place="Enter make"
@@ -292,12 +296,12 @@ const styles = StyleSheet.create({
   },
   radioGroup: {
     flexDirection: "row",
-    alignItems:"center",
-    marginBottom:20
+    alignItems: "center",
+    marginBottom: 20
   },
   radio: {
     flexDirection: "row",
-    alignItems:"center",
+    alignItems: "center",
   },
   detHead: {
     marginVertical: 10
