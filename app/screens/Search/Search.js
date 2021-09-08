@@ -10,10 +10,12 @@ import {
 import { TextInput, TouchableOpacity } from "react-native-gesture-handler";
 import { useList } from "react-firebase-hooks/database";
 import { Feather as Icon } from "@expo/vector-icons";
+import { DataTable, Provider } from 'react-native-paper';
 
 import { colors } from "../../constants/theme";
 import { db } from "../../../firebase";
 import Loading from "../../components/Loading";
+import VehicleDetailsModal from "../../components/VehicleDetailsModal";
 
 const screenWidth = Dimensions.get("window").width;
 
@@ -54,6 +56,15 @@ const Card = ({ plate, dname, vColor, model, make, date }) => {
 
 const Search = () => {
   const [search, setSearch] = useState("");
+  const [visible, setVisible] = useState(false);
+  const [selected, setSelected] = useState({});
+  const showModal = () => setVisible(true);
+  const hideModal = () => {
+    setVisible(false)
+    setSelected({})
+  };
+
+
   const [snapshots, loading, error] = useList(db.ref("Vehicles"));
 
   const vehicles = [];
@@ -68,46 +79,70 @@ const Search = () => {
 
   if (loading) return <Loading />;
 
+  const rowClick =  (plate) => {
+    const vd = vehicles.filter(v=>v.plate===plate)[0];
+    console.log(vd);
+    setSelected(vd)
+    showModal();
+  }
+
   return (
-    <View style={styles.container}>
-      <View style={{ flexDirection: "row" }}>
-        <TextInput
-          value={search}
-          onChangeText={(text) => setSearch(text)}
-          style={styles.input}
-          placeholder="Search"
-        />
-        <View style={styles.filterContainer}>
-          <Icon color={colors.secondaryLight} name="filter" size={25} />
+    <Provider>
+      <View style={styles.container}>
+
+        <VehicleDetailsModal selected={selected} visible={visible} hideModal={hideModal} />
+        <View style={{ flexDirection: "row" }}>
+          <TextInput
+            value={search}
+            onChangeText={(text) => setSearch(text)}
+            style={styles.input}
+            placeholder="Search"
+          />
+          <View style={styles.filterContainer}>
+            <Icon color={colors.secondaryLight} name="filter" size={25} />
+          </View>
         </View>
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          style={styles.cardsContainer}
+        >
+          {filteredVehicles.length > 0 ? (
+            <View style={styles.tableContainer}>
+              <DataTable style={styles.table}>
+                <DataTable.Header style={styles.tableHeader}>
+                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>Plate</Text></DataTable.Title>
+                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>D. ID</Text></DataTable.Title>
+                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>D. Name</Text></DataTable.Title>
+                  <DataTable.Title ><Text style={styles.tableHeaderTitle}>Action</Text></DataTable.Title>
+                </DataTable.Header>
+                {filteredVehicles.map(({ plate, color, driverName, model, make, driverID }) => (
+                  <DataTable.Row style={styles.tableRow} onPress={() => rowClick(plate)}>
+                    <DataTable.Cell><Text style={styles.tableRowContent}>{plate}</Text></DataTable.Cell>
+                    <DataTable.Cell ><Text style={styles.tableRowContent}>Name</Text></DataTable.Cell>
+                    <DataTable.Cell ><Text style={styles.tableRowContent}>Name</Text></DataTable.Cell>
+                    <DataTable.Cell >
+
+                    </DataTable.Cell>
+                  </DataTable.Row>
+
+                )
+                )
+                }
+
+
+              </DataTable>
+            </View>
+
+          ) : (
+            <Text
+              style={{ fontSize: 30, color: colors.primary, textAlign: "center" }}
+            >
+              No vehicle found
+            </Text>
+          )}
+        </ScrollView>
       </View>
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        style={styles.cardsContainer}
-      >
-        {filteredVehicles.length > 0 ? (
-          filteredVehicles.map(
-            ({ plate, color, driverName, model, make, driverID }) => (
-              <Card
-                key={plate}
-                plate={plate}
-                dname={driverName}
-                status="OUT"
-                model={model}
-                make={make}
-                vColor={color}
-              />
-            )
-          )
-        ) : (
-          <Text
-            style={{ fontSize: 30, color: colors.primary, textAlign: "center" }}
-          >
-            No vehicle found
-          </Text>
-        )}
-      </ScrollView>
-    </View>
+    </Provider>
   );
 };
 
@@ -115,7 +150,7 @@ const styles = StyleSheet.create({
   container: {
     backgroundColor: colors.secondary,
     flex: 1,
-    padding: 30,
+    paddingTop: 20
   },
   input: {
     backgroundColor: "#fff",
@@ -126,6 +161,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 0,
     fontSize: 16,
     width: screenWidth - 110,
+    marginLeft: 25,
   },
   filterContainer: {
     width: 50,
@@ -135,31 +171,21 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  cardsContainer: {
-    marginTop: 20,
+  table: {
+    marginTop: 10,
+    marginHorizontal: 25
   },
-  card: {
-    backgroundColor: "#eee",
-    padding: 20,
-    borderRadius: 10,
-    marginBottom: 10,
-    height: 110,
+  tableHeaderTitle: {
+    color: colors.accent,
+    fontSize: 13
   },
-  row: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+  tableHeader: {
   },
-  box: {
-    height: 20,
-    width: 30,
-    position: "relative",
-  },
-  signOutBtn: {
-    backgroundColor: colors.accent,
-    paddingHorizontal: 5,
-    paddingVertical: 5,
-    borderRadius: 10,
-  },
+  tableRowContent: {
+    fontSize: 13,
+    color: "#fff",
+    textAlign: "center"
+  }
 });
 
 export default Search;
