@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import {
   Modal,
   Portal,
@@ -8,18 +8,82 @@ import {
   Button,
 } from "react-native-paper";
 // import * fs from "fs"
-import { StyleSheet, Dimensions, View, Image, TouchableOpacity } from "react-native";
+import { StyleSheet, Dimensions, View, Image, TouchableOpacity, Alert } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import axios from "axios";
 import mime from "mime"
 import { colors } from "../constants/theme";
+import { useList } from "react-firebase-hooks/database";
+import { db } from "../../firebase";
+import MyContext from "../provider/ContextProvider";
+import AuthContext from "../provider/AuthProvider";
 
 const deviceHeight = Dimensions.get("window").height;
 
 const ImageExtractModal = ({ image, visible, hideModal }) => {
   const [loading, setLoading] = useState(false);
-  const [userLoading, setUserLoading] = useState(false);
   const [plate, setPlate] = useState("");
+
+  let [snapshots, ..._] = useList(db.ref("Vehicles"));
+  const { searchVehicleByPlate } = useContext(MyContext);
+
+
+  const [loadPlate, setLoadPlate] = useState(false);
+  const [vehicle, setVehicle] = useState({});
+  const [vehicleError, setVehicleError] = useState("");
+  const [loadingSignIn, setLoadingSignIn] = useState(false);
+  const vehicles = [];
+  // snapshots.forEach((v) => {
+  //   const { plate, color, make, model, driverName, driverID, type } = v.val();
+  //   vehicles.push({ plate, color, make, model, driverName, driverID, type });
+  // });
+
+  const loadVehicle = async () => {
+    setLoadPlate(true);
+    setVehicleError("")
+    console.log("loading....");
+    console.log({ plate: plate.replace("'", "") });
+    try {
+      let v = await searchVehicleByPlate(snapshots, plate.replace("'", "").toLowerCase());
+      setVehicle(v)
+    } catch (error) {
+      setVehicle({})
+      setVehicleError(error)
+    }
+
+    setLoadPlate(false);
+  }
+
+  const { user } = useContext(AuthContext)
+  const signInVehicle = () => {
+    setLoadingSignIn(true);
+    const date = new Date();
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDay();
+    const hour = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+
+    const by = user.email;
+
+    vehicle.by = by;
+    vehicle.status = "in";
+    vehicle.date = `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`;
+
+    try {
+      db.ref("SignedVehicles").push(vehicle);
+      Alert.alert("Success", "Signed in successfully");
+      setPlate("")
+      setVehicle({})
+      hideModal();
+    } catch (error) {
+      Alert.alert("Error", error);
+    }
+    setLoadingSignIn(false);
+
+  };
+
 
   const handleExtract = async () => {
     setPlate("");
@@ -33,24 +97,20 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
     });
     try {
       setLoading(true)
-
       const response = await axios.post("https://smartsign001.herokuapp.com/upload", formData, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
-      console.log(response.data.replace(/\s+/g, ""))
-      setPlate(response.data.replace(/\s+/g, ""))
+      const refinedPlate = response.data.replace(/\s+/g, "").replace("'", "")
+      
+      setPlate(refinedPlate)
       setLoading(false)
+      loadVehicle();
     } catch (error) {
       setLoading(false)
-      console.log(error);
     }
   };
-
-  const loadDriver = async(id) =>{
-      
-  }
 
   return (
     <Portal>
@@ -98,40 +158,66 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
             </View>
 
             <View>
-              <Text style={{
-                color: "#000000",
-                fontWeight: "900",
-                fontSize: 16,
-                borderBottomColor: "#eee",
-                borderBottomWidth: 2
-              }}>Driver Details</Text>
-              {userLoading ?
+              <TouchableOpacity onPress={()=>loadVehicle()}>
+                <Text style={{
+                  color: "#000000",
+                  fontWeight: "900",
+                  fontSize: 16,
+                  borderBottomColor: "#eee",
+                  borderBottomWidth: 2
+                }}>Driver Details</Text>
+              </TouchableOpacity>
+              {loadPlate ?
                 <ActivityIndicator
                   // style={styles.loading}
                   size="small"
                   animating={true}
                   color={Colors.red800} /> :
-                <>
 
-                  <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>Name :
-                    <Text style={styles.detText}> Martin Mwangi</Text>
-                  </Text>
-                  <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>ID :
-                    <Text style={styles.detText}> 354266288</Text>
-                  </Text>
-                  <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>Type :
-                    <Text style={styles.detText}> Staff</Text>
-                  </Text>
-                  <TouchableOpacity style={{ 
-                    backgroundColor: colors.accent, 
-                    alignItems: "center", 
-                    paddingVertical: 8, 
-                    borderRadius: 10,
-                    marginTop: 10
-                     }}>
-                    <Text>Sign In </Text>
-                  </TouchableOpacity>
-                </>}
+                vehicleError ?
+                  <View>
+                    <Text style={{textAlign: "center", fontSize: 20, marginVertical: 15}}>{vehicleError}</Text>
+                    <TouchableOpacity style={{
+                      backgroundColor: colors.accent,
+                      alignItems: "center",
+                      paddingVertical: 8,
+                      borderRadius: 10,
+                      marginTop: 10
+                    }}
+                      onPress={() => {
+                        navigation.navigate('RegSignIn', {
+                          vplate: plate
+                        });
+                      }}
+                    >
+                      <Text style={{color:"#fff", fontSize:20}}>Register and Sign In</Text>
+                    </TouchableOpacity>
+                  </View>
+
+                  :
+                  <>
+                    <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>Name :
+                      <Text style={styles.detText}> {vehicle?.driverName}</Text>
+                    </Text>
+                    <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>ID :
+                      <Text style={styles.detText}> {vehicle?.driverID}</Text>
+                    </Text>
+                    <Text style={{ color: "#000000", fontWeight: "900", fontSize: 14 }}>Type :
+                      <Text style={styles.detText}> {vehicle?.type || "Visitor"}</Text>
+                    </Text>
+                    <TouchableOpacity style={{
+                      backgroundColor: colors.accent,
+                      alignItems: "center",
+                      paddingVertical: 8,
+                      borderRadius: 10,
+                      marginTop: 10
+                    }}
+                      onPress={signInVehicle}
+                    >
+                      <Text style={{color:"#fff", fontSize:20}}>{loadingSignIn ? "Loading..." : " Sign In"}</Text>
+                    </TouchableOpacity>
+                  </>
+              }
             </View>
           </View>
         )}

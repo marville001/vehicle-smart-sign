@@ -17,10 +17,8 @@ import { db } from "../../../firebase";
 import Loading from "../../components/Loading";
 
 const Home = ({ navigation }) => {
-  React.useEffect(() => {
+  useEffect(() => {
     StatusBar.setBackgroundColor(colors.secondary);
-    // StatusBar.setTranslucent(true);
-    // StatusBar.setHidden(true);
   }, []);
 
   const [signed, setSigned] = useState([]);
@@ -62,8 +60,6 @@ const Home = ({ navigation }) => {
       </View>
     );
   };
-
-  const { vehicles } = useContext(MyContext);
 
   if (loading) return <Loading />;
 
@@ -163,7 +159,7 @@ const Home = ({ navigation }) => {
         </TouchableOpacity>
         <TouchableOpacity
           style={[styles.entryButton, styles.exitButton]}
-          onPress={() => navigation.navigate("EntryHome")}
+          // onPress={() => loadVehicle()}
         >
           <Text style={styles.buttonText}>Exit</Text>
         </TouchableOpacity>
