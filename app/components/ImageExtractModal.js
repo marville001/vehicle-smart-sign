@@ -20,7 +20,7 @@ import AuthContext from "../provider/AuthProvider";
 
 const deviceHeight = Dimensions.get("window").height;
 
-const ImageExtractModal = ({ image, visible, hideModal }) => {
+const ImageExtractModal = ({ image, visible, hideModal}) => {
   const [loading, setLoading] = useState(false);
   const [plate, setPlate] = useState("");
 
@@ -184,11 +184,7 @@ const ImageExtractModal = ({ image, visible, hideModal }) => {
                       borderRadius: 10,
                       marginTop: 10
                     }}
-                      onPress={() => {
-                        navigation.navigate('RegSignIn', {
-                          vplate: plate
-                        });
-                      }}
+                      onPress={() =>{}}
                     >
                       <Text style={{color:"#fff", fontSize:20}}>Register and Sign In</Text>
                     </TouchableOpacity>

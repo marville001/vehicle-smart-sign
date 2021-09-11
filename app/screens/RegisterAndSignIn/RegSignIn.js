@@ -24,9 +24,11 @@ const FormInputItem = ({ text, value, place, action }) => {
 };
 
 const RegSignIn = ({ route, navigation }) => {
-  const { vplate } = route.params;
+//   const { vplate } = route.params;
+  console.log({route});
+  console.log({navigation});
 
-  console.log({vplate});
+//   console.log({vplate});
 
   const [plate, setPlate] = useState("");
   const [model, setModel] = useState("");
@@ -91,6 +93,7 @@ const RegSignIn = ({ route, navigation }) => {
       }
 
       setAddLoading(false);
+      signInVehicle();
     } catch (error) {
       Alert.alert("Error", "Failed add. Try again later");
       setAddLoading(false);
@@ -156,16 +159,6 @@ const RegSignIn = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <Text
-        style={{
-          textAlign: "center",
-          fontSize: 20,
-          color: colors.secondary,
-          marginBottom: 20,
-        }}
-      >
-        Add Vehicle
-      </Text>
       {addLoading && (
         <View style={styles.loading}>
           <Text style={styles.loadingText}>Adding...</Text>

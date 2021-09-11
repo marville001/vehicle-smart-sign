@@ -10,7 +10,6 @@ import {
 import AuthContext from "../../provider/AuthProvider";
 import { colors } from "../../constants/theme";
 import AppTabScreen from "./AppTabScreen";
-import RegSignInStack from "../sub_navigation/RegSignInStack";
 
 const CustomDrawercontent = (props) => {
   return (
@@ -62,7 +61,6 @@ const AppDrawer = () => {
 
       >
         <Drawer.Screen name="Home" component={AppTabScreen} />
-        <Drawer.Screen name="RegSignIn" component={RegSignInStack} />
       </Drawer.Navigator>
     </>
   );
