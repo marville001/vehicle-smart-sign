@@ -115,7 +115,7 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal }) => {
       });
       const refinedPlate = response.data.replace(/\s+/g, "").replace("'", "")
 
-      setPlate(refinedPlate)
+      setPlate(refinedPlate.replace("-", ""))
       setLoading(false)
       loadVehicle();
     } catch (error) {

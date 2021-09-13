@@ -139,6 +139,8 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal }) => {
 
   const addVehicleSubmit = async (details) => {
     setAddLoading(true);
+    const { purpose } = details;
+    delete details.purpose;
     try {
       if (plates.includes(details.plate)) {
         Alert.alert(
@@ -146,9 +148,9 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal }) => {
           "This number plate is already registered.!"
         );
       } else {
+        details.purpose = purpose;
         db.ref("Vehicles").push(details);
-        delete details.purpose;
-        signInVehicle(details);        
+        signInVehicle(details);
       }
 
       setAddLoading(false);
@@ -265,16 +267,16 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal }) => {
             />
           </Form>
           <TouchableOpacity style={{
-                      backgroundColor: colors.accent,
-                      alignItems: "center",
-                      paddingVertical: 8,
-                      borderRadius: 10,
-                      marginVertical: 10
-                    }}
-                      onPress={handleAddVehicle}
-                    >
-                      <Text style={{ color: "#fff", fontSize: 20 }}>Register and Sign In</Text>
-                    </TouchableOpacity>
+            backgroundColor: colors.accent,
+            alignItems: "center",
+            paddingVertical: 8,
+            borderRadius: 10,
+            marginVertical: 10
+          }}
+            onPress={handleAddVehicle}
+          >
+            <Text style={{ color: "#fff", fontSize: 20 }}>Register and Sign In</Text>
+          </TouchableOpacity>
         </ScrollView>
       </Modal>
     </Portal>
