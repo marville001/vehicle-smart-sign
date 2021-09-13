@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
   Modal,
   Portal,
@@ -20,7 +20,7 @@ import AuthContext from "../provider/AuthProvider";
 
 const deviceHeight = Dimensions.get("window").height;
 
-const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
+const ImageExtractModal = ({ image, visible, hideModal, showRSModal }) => {
   const [loading, setLoading] = useState(false);
   const [plate, setPlate] = useState("");
 
@@ -33,10 +33,17 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
   const [vehicleError, setVehicleError] = useState("");
   const [loadingSignIn, setLoadingSignIn] = useState(false);
   const vehicles = [];
-  // snapshots.forEach((v) => {
-  //   const { plate, color, make, model, driverName, driverID, type } = v.val();
-  //   vehicles.push({ plate, color, make, model, driverName, driverID, type });
-  // });
+
+  const [vin, setVin] = useState(false)
+  const signedVehicles = useList(db.ref("SignedVehicles"))
+  useEffect(() => {
+    signedVehicles[0].forEach((v) => {
+      const { status } = v.val();
+      if (status == "in")
+        setVin(true);
+    });
+  }, [signedVehicles])
+  
 
   const loadVehicle = async () => {
     setLoadPlate(true);
@@ -71,14 +78,18 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
     vehicle.status = "in";
     vehicle.date = `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`;
 
-    try {
-      db.ref("SignedVehicles").push(vehicle);
-      Alert.alert("Success", "Signed in successfully");
-      setPlate("")
-      setVehicle({})
-      hideModal();
-    } catch (error) {
-      Alert.alert("Error", error);
+    if (vin) {
+      alert("Vehicle is already signed in..")
+    } else {
+      try {
+        db.ref("SignedVehicles").push(vehicle);
+        Alert.alert("Success", "Signed in successfully");
+        setPlate("")
+        setVehicle({})
+        hideModal();
+      } catch (error) {
+        Alert.alert("Error", error);
+      }
     }
     setLoadingSignIn(false);
 
@@ -103,7 +114,7 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
         }
       });
       const refinedPlate = response.data.replace(/\s+/g, "").replace("'", "")
-      
+
       setPlate(refinedPlate)
       setLoading(false)
       loadVehicle();
@@ -158,7 +169,7 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
             </View>
 
             <View>
-              <TouchableOpacity onPress={()=>loadVehicle()}>
+              <TouchableOpacity onPress={() => loadVehicle()}>
                 <Text style={{
                   color: "#000000",
                   fontWeight: "900",
@@ -176,7 +187,7 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
 
                 vehicleError ?
                   <View>
-                    <Text style={{textAlign: "center", fontSize: 20, marginVertical: 15}}>{vehicleError}</Text>
+                    <Text style={{ textAlign: "center", fontSize: 20, marginVertical: 15 }}>{vehicleError}</Text>
                     <TouchableOpacity style={{
                       backgroundColor: colors.accent,
                       alignItems: "center",
@@ -184,9 +195,9 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
                       borderRadius: 10,
                       marginTop: 10
                     }}
-                      onPress={() =>showRSModal(plate)}
+                      onPress={() => showRSModal(plate)}
                     >
-                      <Text style={{color:"#fff", fontSize:20}}>Register and Sign In</Text>
+                      <Text style={{ color: "#fff", fontSize: 20 }}>Register and Sign In</Text>
                     </TouchableOpacity>
                   </View>
 
@@ -210,7 +221,7 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
                     }}
                       onPress={signInVehicle}
                     >
-                      <Text style={{color:"#fff", fontSize:20}}>{loadingSignIn ? "Loading..." : " Sign In"}</Text>
+                      <Text style={{ color: "#fff", fontSize: 20 }}>{loadingSignIn ? "Loading..." : " Sign In"}</Text>
                     </TouchableOpacity>
                   </>
               }

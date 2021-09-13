@@ -58,8 +58,7 @@ const AddVehicle = ({ route, navigation }) => {
       color == "" ||
       make == "" ||
       driverName == "" ||
-      driverID == "" ||
-      type === "visitor" && purpose == ""
+      driverID == ""
     ) {
       setIsValid(false);
       Alert.alert("Input Error", "All fields are required!");
@@ -135,9 +134,9 @@ const AddVehicle = ({ route, navigation }) => {
         driverID: driverID.toLowerCase(),
         type: type.toLowerCase()
       }
-      if (type === "visitor") {
-        details.purpose = purpose
-      }
+      // if (type === "visitor") {
+      //   details.purpose = purpose
+      // }
 
       addVehicleSubmit(details);
     }
@@ -216,12 +215,12 @@ const AddVehicle = ({ route, navigation }) => {
             text="Driver ID"
           />
 
-          {type === "visitor" && <FormInputItem
+          {/* {type === "visitor" && <FormInputItem
             place="Enter purpose"
             value={purpose}
             action={setPurpose}
             text="Purpose of visit"
-          />}
+          />} */}
 
 
           <View style={styles.detHead}>

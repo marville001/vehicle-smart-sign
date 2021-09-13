@@ -5,7 +5,7 @@ import {
   Portal,
   RadioButton
 } from "react-native-paper";
-import { StyleSheet, Dimensions, Alert, View, Text, ScrollView } from "react-native";
+import { StyleSheet, Dimensions, Alert, View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { db } from "../../firebase";
 import AuthContext from "../provider/AuthProvider";
@@ -32,9 +32,7 @@ const FormInputItem = ({ text, value, place, action }) => {
   );
 };
 
-const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
-  const [vehicle, setVehicle] = useState({});
-
+const RegisterSignModal = ({ plate, rsVisible, hideRSModal }) => {
   const [vplate, setVPlate] = useState("");
   const [model, setModel] = useState("");
   const [color, setColor] = useState("");
@@ -46,14 +44,14 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
   const [purpose, setPurpose] = useState("");
 
   const [addLoading, setAddLoading] = useState(false);
-  const [loadingSignIn, setLoadingSignIn] = useState(true);
+  const [loadingSignIn, setLoadingSignIn] = useState(false);
 
   useEffect(() => {
     setVPlate(plate)
   }, [plate])
-  
+
   const { user } = useContext(AuthContext)
-  const signInVehicle = () => {
+  const signInVehicle = (details) => {
     setLoadingSignIn(true);
     const date = new Date();
     const year = date.getFullYear();
@@ -65,16 +63,15 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
 
     const by = user.email;
 
-    vehicle.by = by;
-    vehicle.status = "in";
-    vehicle.date = `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`;
+    details.by = by;
+    details.status = "in";
+    details.date = `${year}/${month}/${day} ${hour}:${minutes}:${seconds}`;
 
     try {
-      db.ref("SignedVehicles").push(vehicle);
+      db.ref("SignedVehicles").push(details);
       Alert.alert("Success", "Signed in successfully");
       // setPlate("")
-      setVehicle({})
-      hideModal();
+      resetInputs();
     } catch (error) {
       Alert.alert("Error", error);
     }
@@ -91,9 +88,6 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
   };
 
   const validateInputs = () => {
-    console.log(plates);
-    let isValid = false;
-
     if (
       vplate == "" ||
       model == "" ||
@@ -116,11 +110,11 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
     }
   };
 
-  const handleAddVehicle = () => {
+  const handleAddVehicle = async () => {
     validateInputs();
     if (isValid) {
       const details = {
-        plate: plate.toLowerCase(),
+        plate: vplate.toLowerCase(),
         model: model.toLowerCase(),
         make: make.toLowerCase(),
         color: color.toLowerCase(),
@@ -131,7 +125,6 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
       if (type === "visitor") {
         details.purpose = purpose
       }
-
       addVehicleSubmit(details);
     }
   };
@@ -154,8 +147,8 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
         );
       } else {
         db.ref("Vehicles").push(details);
-        Alert.alert("Success", "Added successfully");
-        resetInputs();
+        delete details.purpose;
+        signInVehicle(details);        
       }
 
       setAddLoading(false);
@@ -163,6 +156,7 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
       Alert.alert("Error", "Failed add. Try again later");
       setAddLoading(false);
     }
+
   };
 
   return (
@@ -181,96 +175,107 @@ const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
           color="black"
         />
         {addLoading && (
-        <View style={styles.loading}>
-          <Text style={styles.loadingText}>Adding...</Text>
-          <ActivityIndicator color={colors.accent} />
-        </View>
-      )}
+          <View style={styles.loading}>
+            <Text style={styles.loadingText}>Adding...</Text>
+            <ActivityIndicator color={colors.accent} />
+          </View>
+        )}
 
-      {loadingSignIn && (
-        <View style={styles.loading}>
-          <Text style={styles.loadingText}>Signing vehicle...</Text>
-          <ActivityIndicator color={colors.accent} />
-        </View>
-      )}
+        {loadingSignIn && (
+          <View style={styles.loading}>
+            <Text style={styles.loadingText}>Signing vehicle...</Text>
+            <ActivityIndicator color={colors.accent} />
+          </View>
+        )}
         <ScrollView showsVerticalScrollIndicator={false}>
-        <Form
-          onButtonPress={handleAddVehicle}
-          buttonStyle={styles.buttonStyle}
-          buttonTextStyle={styles.buttonTextStyle}
-        >
-          <View style={styles.detHead}>
-            <Text style={styles.det}>Driver Details</Text>
-          </View>
-          <RadioButton.Group
-            onValueChange={newValue => setType(newValue)}
-            value={type}
+          <Form
+            // onButtonPress={handleAddVehicle}
+            buttonStyle={styles.buttonStyle}
+            buttonTextStyle={styles.buttonTextStyle}
           >
-            <View style={styles.radioGroup}>
-              <View style={styles.radio}>
-                <RadioButton value="visitor" />
-                <Text>Visitor</Text>
-              </View>
-              <View style={[styles.radio, { marginLeft: 20 }]}>
-                <RadioButton value="staff" />
-                <Text>Staff</Text>
-              </View>
+            <View style={styles.detHead}>
+              <Text style={styles.det}>Driver Details</Text>
             </View>
-          </RadioButton.Group>
-          <FormInputItem
-            place="Enter driver name"
-            value={driverName}
-            action={setDriverName}
-            text="Driver Name"
-          />
+            <RadioButton.Group
+              onValueChange={newValue => setType(newValue)}
+              value={type}
+            >
+              <View style={styles.radioGroup}>
+                <View style={styles.radio}>
+                  <RadioButton value="visitor" />
+                  <Text>Visitor</Text>
+                </View>
+                <View style={[styles.radio, { marginLeft: 20 }]}>
+                  <RadioButton value="staff" />
+                  <Text>Staff</Text>
+                </View>
+              </View>
+            </RadioButton.Group>
+            <FormInputItem
+              place="Enter driver name"
+              value={driverName}
+              action={setDriverName}
+              text="Driver Name"
+            />
 
-          <FormInputItem
-            place="Enter driver ID"
-            value={driverID}
-            action={setDriverID}
-            text="Driver ID"
-          />
+            <FormInputItem
+              place="Enter driver ID"
+              value={driverID}
+              action={setDriverID}
+              text="Driver ID"
+            />
 
-          {type === "visitor" && <FormInputItem
-            place="Enter purpose"
-            value={purpose}
-            action={setPurpose}
-            text="Purpose of visit"
-          />}
+            {type === "visitor" && <FormInputItem
+              place="Enter purpose"
+              value={purpose}
+              action={setPurpose}
+              text="Purpose of visit"
+            />}
 
 
-          <View style={styles.detHead}>
-            <Text style={styles.det}>Vehicle Details</Text>
-          </View>
+            <View style={styles.detHead}>
+              <Text style={styles.det}>Vehicle Details</Text>
+            </View>
 
-          <FormInputItem
-            place="Enter plate"
-            value={vplate}
-            action={setVPlate}
-            text="Plate Number"
-          />
+            <FormInputItem
+              place="Enter plate"
+              value={vplate}
+              action={setVPlate}
+              text="Plate Number"
+            />
 
-          <FormInputItem
-            place="Enter model"
-            value={model}
-            action={setModel}
-            text="Vehicle Model"
-          />
+            <FormInputItem
+              place="Enter model"
+              value={model}
+              action={setModel}
+              text="Vehicle Model"
+            />
 
-          <FormInputItem
-            place="Enter color"
-            value={color}
-            action={setColor}
-            text="Vehicle Color"
-          />
-          <FormInputItem
-            place="Enter make"
-            value={make}
-            action={setMake}
-            text="Vehicle Make"
-          />
-        </Form>
-      </ScrollView>
+            <FormInputItem
+              place="Enter color"
+              value={color}
+              action={setColor}
+              text="Vehicle Color"
+            />
+            <FormInputItem
+              place="Enter make"
+              value={make}
+              action={setMake}
+              text="Vehicle Make"
+            />
+          </Form>
+          <TouchableOpacity style={{
+                      backgroundColor: colors.accent,
+                      alignItems: "center",
+                      paddingVertical: 8,
+                      borderRadius: 10,
+                      marginVertical: 10
+                    }}
+                      onPress={handleAddVehicle}
+                    >
+                      <Text style={{ color: "#fff", fontSize: 20 }}>Register and Sign In</Text>
+                    </TouchableOpacity>
+        </ScrollView>
       </Modal>
     </Portal>
   );
@@ -293,6 +298,7 @@ const styles = StyleSheet.create({
   },
   buttonStyle: {
     backgroundColor: colors.secondaryLight,
+    display: "none"
   },
   buttonTextStyle: {
     color: colors.primary,
@@ -319,7 +325,7 @@ const styles = StyleSheet.create({
   },
   detHead: {
     marginVertical: 5
-  }, 
+  },
   det: {
     fontSize: 20,
     fontWeight: "bold"
