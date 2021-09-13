@@ -113,7 +113,7 @@ const Home = ({ navigation }) => {
               borderRadius: 10,
               flexDirection: "row",
             }}
-            onTouchEnd={() => alert("search")}
+            onTouchEnd={() => navigation.navigate("Search Vehicle")}
           >
             <Icon name="search" size={20} color={colors.primary} />
             <Text

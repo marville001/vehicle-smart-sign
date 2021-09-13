@@ -20,7 +20,7 @@ import AuthContext from "../provider/AuthProvider";
 
 const deviceHeight = Dimensions.get("window").height;
 
-const ImageExtractModal = ({ image, visible, hideModal}) => {
+const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
   const [loading, setLoading] = useState(false);
   const [plate, setPlate] = useState("");
 
