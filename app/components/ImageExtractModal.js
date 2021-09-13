@@ -184,7 +184,7 @@ const ImageExtractModal = ({ image, visible, hideModal, showRSModal}) => {
                       borderRadius: 10,
                       marginTop: 10
                     }}
-                      onPress={() =>{}}
+                      onPress={() =>showRSModal(plate)}
                     >
                       <Text style={{color:"#fff", fontSize:20}}>Register and Sign In</Text>
                     </TouchableOpacity>

@@ -10,13 +10,21 @@ import RegisterSignModal from "./RegisterSignModal";
 
 const ImageSelector = (props) => {
   const [image, setImage] = useState(null);
+  const [plate, setPlate] = useState(null);
   const [visible, setVisible] = React.useState(false);
   const [rsVisible, setRSVisible] = React.useState(false);
   const showModal = () => setVisible(true);
   const hideModal = () => setVisible(false);
 
-  const showRSModal = () => setRSVisible(true);
-  const hideRSModal = () => setRSVisible(false);
+  const showRSModal = (plate) => {
+    setPlate(plate)
+    setRSVisible(true);
+    hideModal();
+  }
+  const hideRSModal = () => {
+    setPlate(null)
+    setRSVisible(false);
+  }
 
   useEffect(() => {
     (async () => {
@@ -59,7 +67,7 @@ const ImageSelector = (props) => {
   return (
     <Provider>
       <ImageExtractModal image={image} visible={visible} showRSModal={showRSModal} hideModal={hideModal} />
-      <RegisterSignModal image={image} visible={rsVisible} hideRSModal={hideRSModal} />
+      <RegisterSignModal plate={plate} rsVisible={rsVisible} hideRSModal={hideRSModal} />
 
       <View>
         <View style={styles.buttonView}>

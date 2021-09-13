@@ -3,14 +3,14 @@ import {
   Modal,
   Portal
 } from "react-native-paper";
-import { StyleSheet, Dimensions, Alert } from "react-native";
+import { StyleSheet, Dimensions, Alert, View, Text } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { db } from "../../firebase";
 import AuthContext from "../provider/AuthProvider";
 
 const deviceHeight = Dimensions.get("window").height;
 
-const RegisterSignModal = ({ image, rsVisible, hideRSModal}) => {
+const RegisterSignModal = ({ plate, rsVisible, hideRSModal}) => {
   const [vehicle, setVehicle] = useState({});
   
   const { user } = useContext(AuthContext)
@@ -33,7 +33,7 @@ const RegisterSignModal = ({ image, rsVisible, hideRSModal}) => {
     try {
       db.ref("SignedVehicles").push(vehicle);
       Alert.alert("Success", "Signed in successfully");
-      setPlate("")
+      // setPlate("")
       setVehicle({})
       hideModal();
     } catch (error) {
@@ -52,13 +52,15 @@ const RegisterSignModal = ({ image, rsVisible, hideRSModal}) => {
       >
         <MaterialIcons
           onPress={() => {
-            setPlate("")
             hideRSModal()
           }}
           name="cancel"
           size={24}
           color="black"
         />
+        <View>
+          <Text>{plate}</Text>
+        </View>
       </Modal>
     </Portal>
   );
