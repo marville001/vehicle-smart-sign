@@ -63,6 +63,14 @@ const Home = ({ navigation }) => {
 
   if (loading) return <Loading />;
 
+  const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September","October", "November", "December"]
+  const days = [ "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+
+  const date = new Date()
+  const day = date.getDay()
+  const month = date.getMonth();
+  const d = date.getDate();
+
   return (
     <SafeAreaView style={styles.container}>
       <StatusBar />
@@ -76,7 +84,7 @@ const Home = ({ navigation }) => {
               marginTop: 20,
             }}
           >
-            Tuesday July,6
+            {days[day]} {months[month]}, {d}
           </Text>
           <View
             style={{
