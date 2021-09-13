@@ -173,7 +173,7 @@ const AddVehicle = ({ route, navigation }) => {
 
       {loadingSignIn && (
         <View style={styles.loading}>
-          <Text style={styles.loadingText}>Signin vehicle...</Text>
+          <Text style={styles.loadingText}>Signing vehicle...</Text>
           <ActivityIndicator color={colors.accent} />
         </View>
       )}
