@@ -61,7 +61,7 @@ const Search = () => {
   const showModal = () => setVisible(true);
   const hideModal = () => {
     setVisible(false)
-    setSelected({})
+    // setSelected({})
   };
 
 
@@ -69,8 +69,8 @@ const Search = () => {
 
   const vehicles = [];
   snapshots.forEach((v) => {
-    const { plate, color, make, model, driverName, driverID, type } = v.val();
-    vehicles.push({ plate, color, make, model, driverName, driverID, type });
+    const { plate, color, make, model, driverName, driverID, type, status } = v.val();
+    vehicles.push({ plate, color, make, model, driverName, driverID, type, status });
   });
 
   const filteredVehicles = vehicles.filter((v) =>

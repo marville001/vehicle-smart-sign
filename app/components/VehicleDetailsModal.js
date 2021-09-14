@@ -1,16 +1,46 @@
 import { MaterialIcons } from '@expo/vector-icons'
-import React from 'react'
-import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import { useList } from 'react-firebase-hooks/database';
+import { Alert, Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Modal, Portal } from 'react-native-paper'
+import { db } from '../../firebase';
 import { colors } from '../constants/theme';
 
 const deviceHeight = Dimensions.get("window").height;
 
 const VehicleDetailsModal = ({ visible, hideModal, selected }) => {
 
+    const [snapshots, loading, error] = useList(db.ref("SignedVehicles"));
+    const [status, setStatus] = useState(null)
+    const [id, setId] = useState(null)
+
+    const vehicles = [];
+    snapshots.forEach((v) => {
+        const { plate, color, make, model, driverName, driverID, type, status } = v.val();
+        vehicles.push({ plate, color, make, model, driverName, driverID, type, status, id: v.key });
+    });
+
+
+
     const handleSignout = () => {
-        alert('signing out ...')
+        try {
+            const vehicleRef = db.ref('SignedVehicles/' + id);
+            vehicleRef.update({ 'status': 'out' })
+            Alert.alert("Success", "Signed out successfully")
+            hideModal()
+        } catch (error) {
+            alert(error)
+        }
     }
+
+    useEffect(() => {
+        const filteredVehicles = vehicles.filter((v) =>
+            v.plate === (selected?.plate.toLowerCase())
+        );
+
+        setStatus(filteredVehicles[0]?.status)
+        setId(filteredVehicles[0]?.id)
+    }, [selected])
 
     return (
         <Portal>
@@ -54,13 +84,18 @@ const VehicleDetailsModal = ({ visible, hideModal, selected }) => {
                     <Text style={styles.det}>Type</Text>
                     <Text style={styles.det2}>{selected.type}</Text>
                 </View>
-
-                <TouchableOpacity
-                    onPress={handleSignout}
-                    style={styles.loginBtn}
-                >
-                    <Text style={styles.loginText}>Sign Out Vehicle</Text>
-                </TouchableOpacity>
+                {status != null && status === "in" &&
+                    <View style={styles.detCont}>
+                        <Text style={styles.det}>Status</Text>
+                        <Text style={styles.det2}>{status}</Text>
+                    </View>}
+                {status === "in" &&
+                    <TouchableOpacity
+                        onPress={handleSignout}
+                        style={styles.loginBtn}
+                    >
+                        <Text style={styles.loginText}>Sign Out Vehicle</Text>
+                    </TouchableOpacity>}
             </Modal>
         </Portal>
     )

@@ -29,6 +29,7 @@ const Home = ({ navigation }) => {
     db.ref("/SignedVehicles").on("value", (querySnapShot) => {
       let data = querySnapShot.val() ? querySnapShot.val() : {};
       let items = { ...data };
+      console.log({items});
       setSigned(Object.values(items));
     });
   }, []);
